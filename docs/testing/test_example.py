@@ -188,7 +188,7 @@ def test_errors_dict_catches_all_differences(uri_left, uri_right):
         },
         'uris': {
             'left': uri_left,
-            'right': uri_right
+            'right': uri_right,
         }
     }
 
