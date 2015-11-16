@@ -108,7 +108,7 @@ Installation
 
 .. code-block:: bash
 
-    $ pip install alembic-verify
+    $ pip install sqlalchemy-diff
 
 
 Full Example
