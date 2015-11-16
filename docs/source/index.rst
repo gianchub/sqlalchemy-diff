@@ -1,10 +1,9 @@
-Alembic Verify
-==============
+SQLAlchemy Diff
+===============
 
 .. pull-quote::
 
-    Verify that your alembic migrations are valid and equivalent to your
-    models.
+    Compare two database schemas using SQLAlchemy.
 
 
 PyTest Example
@@ -15,12 +14,14 @@ the same:
 
 .. literalinclude:: ../testing/test_example.py
     :lines: 6,8,9,13-22
+    :emphasize-lines: 11
 
 
 You can also make sure that two schemas are different:
 
 .. literalinclude:: ../testing/test_example.py
     :lines: 25-33
+    :emphasize-lines: 7
 
 
 If your test fails, you can dump the errors to a file by just adding
