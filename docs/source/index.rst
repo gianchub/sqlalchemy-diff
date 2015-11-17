@@ -3,36 +3,34 @@ SQLAlchemy Diff
 
 .. pull-quote::
 
-    Compare two database schemas using SQLAlchemy.
+    Compare and generate a diff between two databases using SQLAlchemy's
+    inspection API
 
 
 PyTest Example
 --------------
 
-This is how you can use the library to verify that two schemas are
-the same:
+Comparing two schemas is easy. You can verify they are the same like
+this:
 
-.. literalinclude:: ../testing/test_example.py
+.. literalinclude:: ../../test/endtoend/test_example.py
     :lines: 6,8,9,13-22
-    :emphasize-lines: 11
 
 
-You can also make sure that two schemas are different:
+You can also verify that they are different:
 
-.. literalinclude:: ../testing/test_example.py
+.. literalinclude:: ../../test/endtoend/test_example.py
     :lines: 25-33
-    :emphasize-lines: 7
 
 
-If your test fails, you can dump the errors to a file by just adding
-the following line of code:
+You will get back a ``result`` object: ``result.is_match`` will be
+``True`` when the two schemas are the same, and ``False`` when they are
+different.
 
-.. code-block:: Python
+When two schemas don't match, you can call ``result.dump_errors()`` to
+save all the differences between them to a JSON file that will look
+like this:
 
-    result.dump_errors()
-
-
-That will dump the errors dict to a JSON file that looks like this:
 
 .. code-block:: JSON
 
@@ -82,15 +80,6 @@ That will dump the errors dict to a JSON file that looks like this:
     }
 
 
-Using unittest
---------------
-
-If you prefer, you can use unittest:
-
-.. literalinclude:: ../testing/test_unittest.py
-    :lines: 2-47
-
-
 Features
 --------
 
@@ -109,10 +98,3 @@ Installation
 .. code-block:: bash
 
     $ pip install sqlalchemy-diff
-
-
-Full Example
-------------
-
-:ref:`Here <full_example>` you can find a full example on how to test
-two databases which are different.

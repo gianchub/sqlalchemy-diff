@@ -4,7 +4,7 @@ import json
 import pytest
 
 from sqlalchemydiff.comparer import compare
-from sqlalchemydiff.util import prepare_schema_from_models, walk_dict
+from sqlalchemydiff.util import prepare_schema_from_models
 from .models_left import Base as Base_left
 from .models_right import Base as Base_right
 
@@ -233,3 +233,25 @@ def compare_error_dicts(err1, err2):
         assert_items_equal(walk_dict(err1, path), walk_dict(err2, path))
 
     assert sorted(json.dumps(err1)) == sorted(json.dumps(err2))
+
+
+def walk_dict(d, path):
+    """Walks a dict given a path of keys.
+
+    For example, if we have a dict like this::
+
+        d = {
+            'a': {
+                'B': {
+                    1: ['hello', 'world'],
+                    2: ['hello', 'again'],
+                }
+            }
+        }
+
+    Then ``walk_dict(d, ['a', 'B', 1])`` would return
+    ``['hello', 'world']``.
+    """
+    if not path:
+        return d
+    return walk_dict(d[path[0]], path[1:])

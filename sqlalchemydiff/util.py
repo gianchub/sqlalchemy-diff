@@ -103,25 +103,3 @@ def prepare_schema_from_models(uri, sqlalchemy_base):
     """Creates the database schema from the ``SQLAlchemy`` models. """
     engine = create_engine(uri)
     sqlalchemy_base.metadata.create_all(engine)
-
-
-def walk_dict(d, path):
-    """Walks a dict given a path of keys.
-
-    For example, if we have a dict like this::
-
-        d = {
-            'a': {
-                'B': {
-                    1: ['hello', 'world'],
-                    2: ['hello', 'again'],
-                }
-            }
-        }
-
-    Then ``walk_dict(d, ['a', 'B', 1])`` would return
-    ``['hello', 'world']``.
-    """
-    if not path:
-        return d
-    return walk_dict(d[path[0]], path[1:])

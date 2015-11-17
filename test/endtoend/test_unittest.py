@@ -8,12 +8,12 @@ from sqlalchemydiff.util import (
     get_temporary_uri,
     new_db,
     prepare_schema_from_models,
-    walk_dict,
 )
 from .models_left import Base as Base_left
 from .models_right import Base as Base_right
 
 from test import assert_items_equal
+from test.endtoend.test_example import compare_error_dicts
 
 
 class TestSchemasAreDifferent(unittest.TestCase):
@@ -205,42 +205,4 @@ class TestSchemasAreDifferent(unittest.TestCase):
 
         assert not result.is_match
 
-        self.compare_error_dicts(expected_errors, result.errors)
-
-
-    def compare_error_dicts(self, err1, err2):
-        """Smart comparer of error dicts.
-
-        We cannot directly compare a nested dict structure that has lists
-        as values on some level. The order of the same list in the two dicts
-        could be different, which would lead to a failure in the comparison,
-        but it would be wrong as for us the order doesn't matter and we need
-        a comparison that only checks that the same items are in the lists.
-        In order to do this, we use the walk_dict function to perform a
-        smart comparison only on the lists.
-
-        This function compares the ``tables`` and ``uris`` items, then it does
-        an order-insensitive comparison of all lists, and finally it compares
-        that the sorted JSON dump of both dicts is the same.
-        """
-        assert err1['tables'] == err2['tables']
-        assert err1['uris'] == err2['uris']
-
-        paths = [
-            ['tables_data', 'companies', 'columns', 'diff'],
-            ['tables_data', 'companies', 'indexes', 'left_only'],
-            ['tables_data', 'employees', 'foreign_keys', 'left_only'],
-            ['tables_data', 'employees', 'foreign_keys', 'right_only'],
-            ['tables_data', 'employees', 'indexes', 'left_only'],
-            ['tables_data', 'employees', 'indexes', 'right_only'],
-            ['tables_data', 'roles', 'columns', 'diff'],
-            ['tables_data', 'skills', 'columns', 'diff'],
-            ['tables_data', 'skills', 'columns', 'right_only'],
-            ['tables_data', 'skills', 'primary_keys', 'left_only'],
-            ['tables_data', 'skills', 'primary_keys', 'right_only'],
-        ]
-
-        for path in paths:
-            assert_items_equal(walk_dict(err1, path), walk_dict(err2, path))
-
-        assert sorted(json.dumps(err1)) == sorted(json.dumps(err2))
+        compare_error_dicts(expected_errors, result.errors)
