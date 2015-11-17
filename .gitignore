@@ -1,8 +1,6 @@
 *.py[cod]
 *.egg-info
 .coverage
-wheelhouse
-config
-.env.*
 .cache
 .tox
+docs/build
