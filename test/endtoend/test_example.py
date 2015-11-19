@@ -4,11 +4,40 @@ import json
 import pytest
 
 from sqlalchemydiff.comparer import compare
-from sqlalchemydiff.util import prepare_schema_from_models
+from sqlalchemydiff.util import (
+    destroy_database,
+    get_temporary_uri,
+    new_db,
+    prepare_schema_from_models,
+)
 from .models_left import Base as Base_left
 from .models_right import Base as Base_right
 
 from test import assert_items_equal
+
+
+@pytest.fixture(scope="module")
+def uri_left(db_uri):
+    return get_temporary_uri(db_uri)
+
+
+@pytest.fixture(scope="module")
+def uri_right(db_uri):
+    return get_temporary_uri(db_uri)
+
+
+@pytest.yield_fixture
+def new_db_left(uri_left):
+    new_db(uri_left)
+    yield
+    destroy_database(uri_left)
+
+
+@pytest.yield_fixture
+def new_db_right(uri_right):
+    new_db(uri_right)
+    yield
+    destroy_database(uri_right)
 
 
 @pytest.mark.usefixtures("new_db_left")

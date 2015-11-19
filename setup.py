@@ -13,7 +13,7 @@ with open(os.path.join(here, 'README.rst'), 'r', 'utf-8') as stream:
 
 setup(
     name='sqlalchemy-diff',
-    version='0.0.2',
+    version='0.0.3',
     description='Compare two database schemas using sqlalchemy.',
     long_description=readme,
     author='student.com',
@@ -33,11 +33,6 @@ setup(
         'docs': [
             "Sphinx==1.3.1",
         ],
-    },
-    entry_points={
-        'pytest11': [
-            'sqlalchemy_diff=sqlalchemydiff.pyfixtures'
-        ]
     },
     zip_safe=True,
     license='Apache License, Version 2.0',

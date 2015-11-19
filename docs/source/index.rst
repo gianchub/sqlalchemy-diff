@@ -13,71 +13,72 @@ PyTest Example
 Comparing two schemas is easy. You can verify they are the same like
 this:
 
-.. literalinclude:: ../../test/endtoend/test_example.py
-    :lines: 6,8,9,13-22
+.. code-block:: Python
+
+    >>> result = compare(uri_left, uri_right)
+    >>> result.is_match
+        True
 
 
-You can also verify that they are different:
+When they are different, ``result.is_match`` will be ``False``.
 
-.. literalinclude:: ../../test/endtoend/test_example.py
-    :lines: 25-33
+When two schemas don't match, you can inspect the differences between
+them by looking at the ``errors`` dict on the ``result``:
 
+.. code-block:: Python
 
-You will get back a ``result`` object: ``result.is_match`` will be
-``True`` when the two schemas are the same, and ``False`` when they are
-different.
-
-When two schemas don't match, you can call ``result.dump_errors()`` to
-save all the differences between them to a JSON file that will look
-like this:
-
-
-.. code-block:: JSON
-
-    {
-        'tables': {
-            'left_only': ['addresses'],
-            'right_only': ['roles']
-        },
-        'tables_data': {
-            'employees': {
-                'columns': {
-                    'left_only': [
-                        {
-                            'default': None,
-                            'name': 'favourite_meal',
-                            'nullable': False,
-                            'type': "ENUM('meat','vegan')"
-                        }
-                    ],
-                    'right_only': [
-                        {
-                            'autoincrement': False,
-                            'default': None,
-                            'name': 'role_id',
-                            'nullable': False,
-                            'type': 'INTEGER(11)'
-                        },
-                        {
-                            'autoincrement': False,
-                            'default': None,
-                            'name': 'number_of_pets',
-                            'nullable': False,
-                            'type': 'INTEGER(11)'
-                        },
-                    ]
+    >>> result = compare(uri_left, uri_right)
+    >>> result.is_match
+        False
+    >>> result.errors
+            {
+                'tables': {
+                    'left_only': ['addresses'],
+                    'right_only': ['roles']
                 },
-                'foreign_keys': { ... },
-                'primary_keys': { ... },
-                'indexes': { .. }
-            },
-            'phone_numbers': { ... }
-        },
-        'uris': {
-            'left': "your left URI",
-            'right': "your right URI",
-        }
-    }
+                'tables_data': {
+                    'employees': {
+                        'columns': {
+                            'left_only': [
+                                {
+                                    'default': None,
+                                    'name': 'favourite_meal',
+                                    'nullable': False,
+                                    'type': "ENUM('meat','vegan')"
+                                }
+                            ],
+                            'right_only': [
+                                {
+                                    'autoincrement': False,
+                                    'default': None,
+                                    'name': 'role_id',
+                                    'nullable': False,
+                                    'type': 'INTEGER(11)'
+                                },
+                                {
+                                    'autoincrement': False,
+                                    'default': None,
+                                    'name': 'number_of_pets',
+                                    'nullable': False,
+                                    'type': 'INTEGER(11)'
+                                },
+                            ]
+                        },
+                        'foreign_keys': { ... },
+                        'primary_keys': { ... },
+                        'indexes': { .. }
+                    },
+                    'phone_numbers': { ... }
+                },
+                'uris': {
+                    'left': "your left URI",
+                    'right': "your right URI",
+                }
+            }
+
+
+If you wish to persist that dict to a JSON file, you can quickly do so
+by calling ``result.dump_errors()``.
 
 
 Features
