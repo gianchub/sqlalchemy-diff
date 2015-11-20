@@ -1,0 +1,6 @@
+*.py[cod]
+*.egg-info
+.coverage
+.cache
+.tox
+docs/build
