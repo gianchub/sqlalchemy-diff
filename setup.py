@@ -22,7 +22,7 @@ setup(
     packages=find_packages(exclude=['docs', 'test', 'test.*']),
     install_requires=[
         "six==1.10.0",
-        "mock==1.3.0",
+        "mock>=1.3.0",
         "sqlalchemy-utils==0.31.2",
     ],
     extras_require={
@@ -34,6 +34,9 @@ setup(
             "Sphinx==1.3.1",
         ],
     },
+    dependency_links=[
+        "dists/mysql-connector-python-2.0.4.zip",
+    ],
     zip_safe=True,
     license='Apache License, Version 2.0',
     classifiers=[
