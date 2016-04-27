@@ -3,6 +3,7 @@ from collections import namedtuple
 from uuid import uuid4
 import json
 
+import six
 from sqlalchemy import inspect, create_engine
 from sqlalchemy_utils import create_database, drop_database, database_exists
 
@@ -128,6 +129,9 @@ class IgnoreManager:
         return ignore
 
     def validate_clause(self, data):
+        if not isinstance(data, six.string_types):
+            raise TypeError('{} is not a string'.format(data))
+
         if len(data.split('.')) != 3:
             raise ValueError(
                 '{} is not a well formed clause: table_name.identifier.name'

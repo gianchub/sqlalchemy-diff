@@ -135,13 +135,11 @@ class TestIgnoreManager:
             "unknown is invalid. It must be in ['pk', 'fk', 'idx', 'col']",
         ) == err.value.args
 
-    @pytest.mark.parametrize('clause',
-        [
+    @pytest.mark.parametrize('clause', [
             'none',
             'too.few',
             'too.many.definitely.for-sure',
-        ]
-    )
+    ])
     def test_incorrect_clause(self, clause):
         ignore_data = [clause]
 
@@ -153,12 +151,10 @@ class TestIgnoreManager:
             .format(clause),
         ) == err.value.args
 
-    @pytest.mark.parametrize('clause',
-        [
+    @pytest.mark.parametrize('clause', [
             '.pk.b',
             'a.pk.',
-        ]
-    )
+    ])
     def test_incorrect_empty_clause(self, clause):
         ignore_data = [clause]
 
@@ -170,8 +166,23 @@ class TestIgnoreManager:
             .format(clause),
         ) == err.value.args
 
+    @pytest.mark.parametrize('clause', [
+        3,
+        3.14159265,
+        [],
+        (),
+        {},
+        None,
+    ])
+    def test_type_error_clause(self, clause):
+        ignore_data = [clause]
 
-# test empty clause between dots (all three positions)
-# test type error on single clause
+        with pytest.raises(TypeError) as err:
+            IgnoreManager(ignore_data)
+
+        assert (
+            '{} is not a string'.format(clause),
+        ) == err.value.args
+
+
 # test get
-# ...
