@@ -103,3 +103,56 @@ def prepare_schema_from_models(uri, sqlalchemy_base):
     """Creates the database schema from the ``SQLAlchemy`` models. """
     engine = create_engine(uri)
     sqlalchemy_base.metadata.create_all(engine)
+
+
+class IgnoreManager:
+
+    allowed_identifiers = ['pk', 'fk', 'idx', 'col']
+
+    def __init__(self, ignore_data):
+        self.ignore = self.parse(ignore_data)
+
+    def parse(self, ignore_data):
+        ignore = {}
+        for data in ignore_data:
+
+            self.validate_clause(data)
+            table_name, identifier, name = self.fetch_data_items(data)
+            self.validate_items(table_name, identifier, name)
+
+            names = (
+                ignore.setdefault(table_name, {}).setdefault(identifier, [])
+            )
+            names.append(name)
+
+        return ignore
+
+    def validate_clause(self, data):
+        if len(data.split('.')) != 3:
+            raise ValueError(
+                '{} is not a well formed clause: table_name.identifier.name'
+                .format(data)
+            )
+
+    def fetch_data_items(self, data):
+        return [item.strip() for item in data.split('.')]
+
+    def validate_items(self, table_name, identifier, name):
+        if identifier not in self.allowed_identifiers:
+            raise ValueError(
+                '{} is invalid. It must be in {}'.format(
+                    identifier, self.allowed_identifiers
+                )
+            )
+
+        if not table_name or not identifier or not name:
+            raise ValueError(
+                '{} is not a well formed clause: table_name.identifier.name'
+                .format('.'.join(
+                    (table_name, identifier, name)
+                    )
+                )
+            )
+
+    def get(self, table_name, identifier):
+        pass
