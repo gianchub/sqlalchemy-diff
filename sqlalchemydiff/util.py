@@ -114,8 +114,8 @@ class IgnoreManager:
 
     def parse(self, ignore_data):
         ignore = {}
-        for data in ignore_data:
 
+        for data in ignore_data:
             self.validate_clause(data)
             table_name, identifier, name = self.fetch_data_items(data)
             self.validate_items(table_name, identifier, name)
@@ -145,13 +145,11 @@ class IgnoreManager:
                 )
             )
 
-        if not table_name or not identifier or not name:
+        items = (table_name, identifier, name)
+        if not all(items):
             raise ValueError(
                 '{} is not a well formed clause: table_name.identifier.name'
-                .format('.'.join(
-                    (table_name, identifier, name)
-                    )
-                )
+                .format('.'.join(items))
             )
 
     def get(self, table_name, identifier):
