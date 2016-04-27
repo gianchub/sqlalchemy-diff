@@ -88,8 +88,13 @@ class TestIgnoreManager:
             'table-C.idx.admin_id',
         ]
 
-    def test_init_empty(self):
-        im = IgnoreManager([])
+    @pytest.mark.parametrize('ignore', [
+        None,
+        [],
+        (),
+    ])
+    def test_init_empty(self, ignore):
+        im = IgnoreManager(ignore)
 
         assert {} == im.ignore
 
@@ -184,5 +189,20 @@ class TestIgnoreManager:
             '{} is not a string'.format(clause),
         ) == err.value.args
 
+    def test_get_missing_table(self):
+        ignore_data = []
 
-# test get
+        im = IgnoreManager(ignore_data)
+
+        assert [] == im.get('some-table-name', 'some-identifier')
+
+    def test_get_missing_identifier(self, ignore_data):
+        im = IgnoreManager(ignore_data)
+
+        assert [] == im.get('table-C', 'pk')
+
+    def test_get(self, ignore_data):
+        im = IgnoreManager(ignore_data)
+
+        assert ['id'] == im.get('table-A', 'pk')
+        assert ['user_id', 'address_id'] == im.get('table-A', 'fk')

@@ -111,7 +111,7 @@ class IgnoreManager:
     allowed_identifiers = ['pk', 'fk', 'idx', 'col']
 
     def __init__(self, ignore_data):
-        self.ignore = self.parse(ignore_data)
+        self.ignore = self.parse(ignore_data or [])
 
     def parse(self, ignore_data):
         ignore = {}
@@ -157,4 +157,4 @@ class IgnoreManager:
             )
 
     def get(self, table_name, identifier):
-        pass
+        return self.ignore.get(table_name, {}).get(identifier, [])
