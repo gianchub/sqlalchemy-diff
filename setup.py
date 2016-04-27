@@ -22,16 +22,17 @@ setup(
     packages=find_packages(exclude=['docs', 'test', 'test.*']),
     install_requires=[
         "six==1.10.0",
-        "mock>=1.3.0",
-        "sqlalchemy-utils==0.31.2",
+        "mock==2.0.0",
+        "sqlalchemy-utils==0.32.4",
+        "pyyaml==3.11",
     ],
     extras_require={
         'dev': [
             "mysql-connector-python==2.0.4",
-            "pytest==2.8.2",
+            "pytest==2.9.1",
         ],
         'docs': [
-            "Sphinx==1.3.1",
+            "sphinx==1.4.1",
         ],
     },
     dependency_links=[
