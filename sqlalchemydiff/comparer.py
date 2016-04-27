@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from copy import deepcopy
 
-from .util import TablesInfo, DiffResult, InspectorFactory, CompareResult
+from .util import (
+    TablesInfo, DiffResult, InspectorFactory, CompareResult, IgnoreManager
+)
 
 
-def compare(left_uri, right_uri, ignore_tables=None):
+def compare(left_uri, right_uri, ignore_tables=None, ignore_data=None):
     """Compare two databases, given two URIs.
 
     Compare two databases, given two URIs and a (possibly empty) set of
@@ -67,12 +69,18 @@ def compare(left_uri, right_uri, ignore_tables=None):
         A set of string values to be excluded from both databases (if
         present) when doing the comparison.  String matching is case
         sensitive.
+    :param iterable ignore_data:
+        A list of strings in the format `table_name.identifier.name`,
+        where `identifier` is one of (`col`, `pk`, `fk`, `idx`) and name
+        is the name to be excluded from the comparison.
     :return:
         A :class:`~.util.CompareResult` object with ``info`` and
         ``errors`` dicts populated with the comparison result.
     """
     if ignore_tables is None:
         ignore_tables = set()
+
+    ignore_manager = IgnoreManager(ignore_data)
 
     left_inspector, right_inspector = _get_inspectors(left_uri, right_uri)
 
@@ -82,7 +90,8 @@ def compare(left_uri, right_uri, ignore_tables=None):
     info = _get_info_dict(left_uri, right_uri, tables_info)
 
     info['tables_data'] = _get_tables_data(
-        tables_info.common, left_inspector, right_inspector)
+        tables_info.common, left_inspector, right_inspector, ignore_manager
+    )
 
     errors = _compile_errors(info)
     result = _make_result(info, errors)
@@ -157,32 +166,53 @@ def _get_info_dict(left_uri, right_uri, tables_info):
     return info
 
 
-def _get_tables_data(tables_common, left_inspector, right_inspector):
+def _get_tables_data(
+    tables_common, left_inspector, right_inspector, ignore_manager
+):
     tables_data = {}
 
     for table_name in tables_common:
         table_data = _get_table_data(
-            left_inspector, right_inspector, table_name)
+            left_inspector, right_inspector, table_name, ignore_manager
+        )
         tables_data[table_name] = table_data
 
     return tables_data
 
 
-def _get_table_data(left_inspector, right_inspector, table_name):
+def _get_table_data(
+    left_inspector, right_inspector, table_name, ignore_manager
+):
     table_data = {}
 
     # foreign keys
     table_data['foreign_keys'] = _get_foreign_keys_info(
-        left_inspector, right_inspector, table_name)
+        left_inspector,
+        right_inspector,
+        table_name,
+        ignore_manager.get(table_name, 'fk')
+    )
 
     table_data['primary_keys'] = _get_primary_keys_info(
-        left_inspector, right_inspector, table_name)
+        left_inspector,
+        right_inspector,
+        table_name,
+        ignore_manager.get(table_name, 'pk')
+    )
 
     table_data['indexes'] = _get_indexes_info(
-        left_inspector, right_inspector, table_name)
+        left_inspector,
+        right_inspector,
+        table_name,
+        ignore_manager.get(table_name, 'idx')
+    )
 
     table_data['columns'] = _get_columns_info(
-        left_inspector, right_inspector, table_name)
+        left_inspector,
+        right_inspector,
+        table_name,
+        ignore_manager.get(table_name, 'col')
+    )
 
     return table_data
 
@@ -225,7 +255,9 @@ def _diff_dicts(left, right):
     )._asdict()
 
 
-def _get_foreign_keys_info(left_inspector, right_inspector, table_name):
+def _get_foreign_keys_info(
+    left_inspector, right_inspector, table_name, ignore
+):
     left_fk_list = _get_foreign_keys(left_inspector, table_name)
     right_fk_list = _get_foreign_keys(right_inspector, table_name)
 
@@ -240,7 +272,9 @@ def _get_foreign_keys(inspector, table_name):
     return inspector.get_foreign_keys(table_name)
 
 
-def _get_primary_keys_info(left_inspector, right_inspector, table_name):
+def _get_primary_keys_info(
+    left_inspector, right_inspector, table_name, ignore
+):
     left_pk_list = _get_primary_keys(left_inspector, table_name)
     right_pk_list = _get_primary_keys(right_inspector, table_name)
 
@@ -255,7 +289,7 @@ def _get_primary_keys(inspector, table_name):
     return inspector.get_primary_keys(table_name)
 
 
-def _get_indexes_info(left_inspector, right_inspector, table_name):
+def _get_indexes_info(left_inspector, right_inspector, table_name, ignore):
     left_index_list = _get_indexes(left_inspector, table_name)
     right_index_list = _get_indexes(right_inspector, table_name)
 
@@ -270,7 +304,7 @@ def _get_indexes(inspector, table_name):
     return inspector.get_indexes(table_name)
 
 
-def _get_columns_info(left_inspector, right_inspector, table_name):
+def _get_columns_info(left_inspector, right_inspector, table_name, ignore):
     left_columns_list = _get_columns(left_inspector, table_name)
     right_columns_list = _get_columns(right_inspector, table_name)
 
