@@ -6,7 +6,7 @@ import uuid
 import pytest
 
 from sqlalchemydiff.util import CompareResult, InspectorFactory, IgnoreManager
-from mock import Mock, patch, call
+from mock import Mock, patch
 
 
 class TestCompareResult(object):
@@ -23,10 +23,10 @@ class TestCompareResult(object):
         info, errors = {}, {}
         result = CompareResult(info, errors)
 
-        assert True == result.is_match
+        assert result.is_match
 
         result.errors = {1: 1}
-        assert False == result.is_match
+        assert not result.is_match
 
     def test_dump_info(self):
         info = {'some': 'info'}

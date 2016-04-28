@@ -157,7 +157,7 @@ class TestCompareCallsChain(object):
 @pytest.mark.usefixtures("mock_inspector_factory")
 class TestCompareInternals(object):
 
-    ## FIXTURES
+    # FIXTURES
 
     @pytest.yield_fixture
     def _get_table_data_mock(self):
@@ -219,7 +219,7 @@ class TestCompareInternals(object):
         with patch('sqlalchemydiff.comparer._get_columns_info') as m:
             yield m
 
-    ## TESTS
+    # TESTS
 
     def test__get_inspectors(self):
         left_inspector_mock, right_inspector_mock = Mock(), Mock()
