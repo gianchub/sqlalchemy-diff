@@ -123,6 +123,29 @@ class TestIgnoreManager:
         assert expected_ignore == im.ignore_data
         assert expected_tables == im.ignore_tables
 
+    def test_init_alternative_separator(self, ignore_data):
+        ignore_data = [clause.replace('.', '#') for clause in ignore_data]
+        im = IgnoreManager(ignore_data, separator='#')
+
+        expected_ignore = {
+            'table-A': {
+                'pk': ['id'],
+                'fk': ['user_id', 'address_id'],
+            },
+            'table-B': {
+                'pk': ['root_id'],
+            },
+            'table-C': {
+                'col': ['telephone'],
+                'idx': ['admin_id'],
+            },
+        }
+
+        expected_tables = set(['table-D', 'table-E'])
+
+        assert expected_ignore == im.ignore_data
+        assert expected_tables == im.ignore_tables
+
     def test_ignore_tables_property(self, ignore_data):
         im = IgnoreManager(ignore_data)
 

@@ -110,7 +110,8 @@ class IgnoreManager:
 
     allowed_identifiers = ['pk', 'fk', 'idx', 'col']
 
-    def __init__(self, ignores):
+    def __init__(self, ignores, separator='.'):
+        self.separator = separator
         self.parse(ignores or [])
 
     def parse(self, ignores):
@@ -134,21 +135,21 @@ class IgnoreManager:
         self.__tables = tables
 
     def is_table_name(self, data):
-        return data.count('.') == 0
+        return data.count(self.separator) == 0
 
     def validate_type(self, data):
         if not isinstance(data, six.string_types):
             raise TypeError('{} is not a string'.format(data))
 
     def validate_clause(self, data):
-        if len(data.split('.')) != 3:
+        if len(data.split(self.separator)) != 3:
             raise ValueError(
                 '{} is not a well formed clause: table_name.identifier.name'
                 .format(data)
             )
 
     def fetch_data_items(self, data):
-        return [item.strip() for item in data.split('.')]
+        return [item.strip() for item in data.split(self.separator)]
 
     def validate_items(self, table_name, identifier, name):
         if identifier not in self.allowed_identifiers:
@@ -162,7 +163,7 @@ class IgnoreManager:
         if not all(items):
             raise ValueError(
                 '{} is not a well formed clause: table_name.identifier.name'
-                .format('.'.join(items))
+                .format(self.separator.join(items))
             )
 
     def get(self, table_name, identifier):
