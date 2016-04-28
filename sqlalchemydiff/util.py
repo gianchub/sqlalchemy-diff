@@ -110,28 +110,37 @@ class IgnoreManager:
 
     allowed_identifiers = ['pk', 'fk', 'idx', 'col']
 
-    def __init__(self, ignore_data):
-        self.ignore = self.parse(ignore_data or [])
+    def __init__(self, ignores):
+        self.parse(ignores or [])
 
-    def parse(self, ignore_data):
-        ignore = {}
+    def parse(self, ignores):
+        ignore, tables = {}, set()
 
-        for data in ignore_data:
-            self.validate_clause(data)
-            table_name, identifier, name = self.fetch_data_items(data)
-            self.validate_items(table_name, identifier, name)
+        for data in ignores:
+            self.validate_type(data)
 
-            names = (
-                ignore.setdefault(table_name, {}).setdefault(identifier, [])
-            )
-            names.append(name)
+            if self.is_table_name(data):
+                tables.add(data.strip())
+            else:
+                self.validate_clause(data)
+                table_name, identifier, name = self.fetch_data_items(data)
+                self.validate_items(table_name, identifier, name)
 
-        return ignore
+                ignore.setdefault(
+                    table_name, {}
+                ).setdefault(identifier, []).append(name)
 
-    def validate_clause(self, data):
+        self.__ignore = ignore
+        self.__tables = tables
+
+    def is_table_name(self, data):
+        return data.count('.') == 0
+
+    def validate_type(self, data):
         if not isinstance(data, six.string_types):
             raise TypeError('{} is not a string'.format(data))
 
+    def validate_clause(self, data):
         if len(data.split('.')) != 3:
             raise ValueError(
                 '{} is not a well formed clause: table_name.identifier.name'
@@ -157,4 +166,12 @@ class IgnoreManager:
             )
 
     def get(self, table_name, identifier):
-        return self.ignore.get(table_name, {}).get(identifier, [])
+        return self.__ignore.get(table_name, {}).get(identifier, [])
+
+    @property
+    def ignore_tables(self):
+        return self.__tables.copy()
+
+    @property
+    def ignore_data(self):
+        return self.__ignore.copy()

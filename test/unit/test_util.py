@@ -86,6 +86,8 @@ class TestIgnoreManager:
             'table-B.pk.root_id',
             'table-C.col.telephone',
             'table-C.idx.admin_id',
+            'table-D',
+            'table-E',
         ]
 
     @pytest.mark.parametrize('ignore', [
@@ -96,12 +98,13 @@ class TestIgnoreManager:
     def test_init_empty(self, ignore):
         im = IgnoreManager(ignore)
 
-        assert {} == im.ignore
+        assert {} == im.ignore_data
+        assert set() == im.ignore_tables
 
     def test_init(self, ignore_data):
         im = IgnoreManager(ignore_data)
 
-        expected_map = {
+        expected_ignore = {
             'table-A': {
                 'pk': ['id'],
                 'fk': ['user_id', 'address_id'],
@@ -115,20 +118,60 @@ class TestIgnoreManager:
             },
         }
 
-        assert expected_map == im.ignore
+        expected_tables = set(['table-D', 'table-E'])
+
+        assert expected_ignore == im.ignore_data
+        assert expected_tables == im.ignore_tables
+
+    def test_ignore_tables_property(self, ignore_data):
+        im = IgnoreManager(ignore_data)
+
+        expected_tables = set(['table-D', 'table-E'])
+
+        assert expected_tables == im.ignore_tables
+
+        # make sure the property returns a copy
+        im.ignore_tables.add('another-table')
+        assert expected_tables == im.ignore_tables
+
+    def test_ignore_data_property(self, ignore_data):
+        im = IgnoreManager(ignore_data)
+
+        expected_ignore = {
+            'table-A': {
+                'pk': ['id'],
+                'fk': ['user_id', 'address_id'],
+            },
+            'table-B': {
+                'pk': ['root_id'],
+            },
+            'table-C': {
+                'col': ['telephone'],
+                'idx': ['admin_id'],
+            },
+        }
+
+        assert expected_ignore == im.ignore_data
+
+        # make sure the property returns a copy
+        im.ignore_data['another-table'] = {'something': 'else'}
+        assert expected_ignore == im.ignore_data
 
     def test_init_strip(self):
-        ignore_data = ['  table-A  .  pk  .  id  ']
+        ignore_data = ['  table-A  .  pk  .  id  ', '   table-C  ']
 
         im = IgnoreManager(ignore_data)
 
-        expected_map = {
+        expected_ignore = {
             'table-A': {
                 'pk': ['id']
             }
         }
 
-        assert expected_map == im.ignore
+        expected_tables = set(['table-C'])
+
+        assert expected_ignore == im.ignore_data
+        assert expected_tables == im.ignore_tables
 
     def test_identifier_incorrect(self):
         ignore_data = ['table-A.unknown.some-name']
@@ -141,7 +184,6 @@ class TestIgnoreManager:
         ) == err.value.args
 
     @pytest.mark.parametrize('clause', [
-            'none',
             'too.few',
             'too.many.definitely.for-sure',
     ])
