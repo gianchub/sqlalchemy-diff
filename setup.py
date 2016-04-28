@@ -22,7 +22,7 @@ setup(
     packages=find_packages(exclude=['docs', 'test', 'test.*']),
     install_requires=[
         "six==1.10.0",
-        "mock==2.0.0",
+        "mock>=2.0.0",
         "sqlalchemy-utils==0.32.4",
         "pyyaml==3.11",
     ],
