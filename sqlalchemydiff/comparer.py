@@ -256,10 +256,13 @@ def _diff_dicts(left, right):
 
 
 def _get_foreign_keys_info(
-    left_inspector, right_inspector, table_name, ignore
+    left_inspector, right_inspector, table_name, ignores
 ):
     left_fk_list = _get_foreign_keys(left_inspector, table_name)
     right_fk_list = _get_foreign_keys(right_inspector, table_name)
+
+    left_fk_list = _discard_ignores_by_name(left_fk_list, ignores)
+    right_fk_list = _discard_ignores_by_name(right_fk_list, ignores)
 
     # process into dict
     left_fk = dict((elem['name'], elem) for elem in left_fk_list)
@@ -273,10 +276,13 @@ def _get_foreign_keys(inspector, table_name):
 
 
 def _get_primary_keys_info(
-    left_inspector, right_inspector, table_name, ignore
+    left_inspector, right_inspector, table_name, ignores
 ):
     left_pk_list = _get_primary_keys(left_inspector, table_name)
     right_pk_list = _get_primary_keys(right_inspector, table_name)
+
+    left_pk_list = _discard_ignores(left_pk_list, ignores)
+    right_pk_list = _discard_ignores(right_pk_list, ignores)
 
     # process into dict
     left_pk = dict((elem, elem) for elem in left_pk_list)
@@ -289,9 +295,12 @@ def _get_primary_keys(inspector, table_name):
     return inspector.get_primary_keys(table_name)
 
 
-def _get_indexes_info(left_inspector, right_inspector, table_name, ignore):
+def _get_indexes_info(left_inspector, right_inspector, table_name, ignores):
     left_index_list = _get_indexes(left_inspector, table_name)
     right_index_list = _get_indexes(right_inspector, table_name)
+
+    left_index_list = _discard_ignores_by_name(left_index_list, ignores)
+    right_index_list = _discard_ignores_by_name(right_index_list, ignores)
 
     # process into dict
     left_index = dict((elem['name'], elem) for elem in left_index_list)
@@ -304,9 +313,12 @@ def _get_indexes(inspector, table_name):
     return inspector.get_indexes(table_name)
 
 
-def _get_columns_info(left_inspector, right_inspector, table_name, ignore):
+def _get_columns_info(left_inspector, right_inspector, table_name, ignores):
     left_columns_list = _get_columns(left_inspector, table_name)
     right_columns_list = _get_columns(right_inspector, table_name)
+
+    left_columns_list = _discard_ignores_by_name(left_columns_list, ignores)
+    right_columns_list = _discard_ignores_by_name(right_columns_list, ignores)
 
     # process into dict
     left_columns = dict((elem['name'], elem) for elem in left_columns_list)
@@ -321,6 +333,14 @@ def _get_columns_info(left_inspector, right_inspector, table_name, ignore):
 
 def _get_columns(inspector, table_name):
     return inspector.get_columns(table_name)
+
+
+def _discard_ignores_by_name(items, ignores):
+    return [item for item in items if item['name'] not in ignores]
+
+
+def _discard_ignores(items, ignores):
+    return [item for item in items if item not in ignores]
 
 
 def _process_types(column_dict):
