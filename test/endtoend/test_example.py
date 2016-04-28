@@ -319,6 +319,37 @@ def test_ignores(uri_left, uri_right):
 
 @pytest.mark.usefixtures("new_db_left")
 @pytest.mark.usefixtures("new_db_right")
+def test_ignores_alternative_sep(uri_left, uri_right):
+    # functionally the same of `test_errors_dict_catches_all_differences`
+    # but all errors are silenced with ignores
+    prepare_schema_from_models(uri_left, Base_left)
+    prepare_schema_from_models(uri_right, Base_right)
+
+    ignores = [
+        'mobile_numbers',
+        'phone_numbers',
+        'companies#col#name',
+        'companies#idx#name',
+        'employees#fk#fk_employees_companies',
+        'employees#fk#fk_emp_comp',
+        'employees#idx#ix_employees_name',
+        'employees#idx#fk_employees_companies',
+        'employees#idx#name',
+        'employees#idx#fk_emp_comp',
+        'roles#col#name',
+        'skills#col#slug',
+        'skills#col#id',
+        'skills#pk#slug',
+        'skills#pk#id',
+    ]
+
+    result = compare(uri_left, uri_right, ignores=ignores, ignores_sep='#')
+
+    assert result.is_match
+
+
+@pytest.mark.usefixtures("new_db_left")
+@pytest.mark.usefixtures("new_db_right")
 @pytest.mark.parametrize('missing_ignore', [
     'mobile_numbers',
     'phone_numbers',
