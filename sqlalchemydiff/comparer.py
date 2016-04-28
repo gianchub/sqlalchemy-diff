@@ -6,11 +6,10 @@ from .util import (
 )
 
 
-def compare(left_uri, right_uri, ignore_tables=None, ignore_data=None):
+def compare(left_uri, right_uri, ignores=None, ignores_sep=None):
     """Compare two databases, given two URIs.
 
-    Compare two databases, given two URIs and a (possibly empty) set of
-    tables to ignore during the comparison.
+    Compare two databases, ignoring whatever is specified in `ignores`.
 
     The ``info`` dict has this structure::
 
@@ -65,27 +64,28 @@ def compare(left_uri, right_uri, ignore_tables=None, ignore_data=None):
 
     :param string left_uri: The URI for the first (left) database.
     :param string right_uri: The URI for the second (right) database.
-    :param set ignore_tables:
-        A set of string values to be excluded from both databases (if
-        present) when doing the comparison.  String matching is case
-        sensitive.
-    :param iterable ignore_data:
-        A list of strings in the format `table_name.identifier.name`,
-        where `identifier` is one of (`col`, `pk`, `fk`, `idx`) and name
-        is the name to be excluded from the comparison.
+    :param iterable ignores:
+        A list of strings in the format:
+          * `table-name`
+          * `table-name.identifier.name`
+
+        If a table name is specified, the whole table is excluded from
+        comparison.  If a complete clause is specified, then only the
+        specified element is excluded from comparison.  `identifier` is one
+        of (`col`, `pk`, `fk`, `idx`) and name is the name of the element
+        to be excluded from the comparison.
+    :param string ignores_sep:
+        Separator to be used to spilt the `ignores` clauses.
     :return:
         A :class:`~.util.CompareResult` object with ``info`` and
         ``errors`` dicts populated with the comparison result.
     """
-    if ignore_tables is None:
-        ignore_tables = set()
-
-    ignore_manager = IgnoreManager(ignore_data)
+    ignore_manager = IgnoreManager(ignores, separator=ignores_sep)
 
     left_inspector, right_inspector = _get_inspectors(left_uri, right_uri)
 
     tables_info = _get_tables_info(
-        left_inspector, right_inspector, ignore_tables)
+        left_inspector, right_inspector, ignore_manager.ignore_tables)
 
     info = _get_info_dict(left_uri, right_uri, tables_info)
 

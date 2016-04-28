@@ -110,7 +110,7 @@ class TestCompareCallsChain(object):
         tables_info = _get_tables_info_mock.return_value
 
         result = compare(
-            "left_uri", "right_uri", ignore_tables=set(['ignore_me']))
+            "left_uri", "right_uri", ignores=['ignore_me'])
 
         expected_info = {
             'uris': {
@@ -145,7 +145,7 @@ class TestCompareCallsChain(object):
             _get_tables_data_mock, _compile_errors_mock):
         left_inspector, right_inspector = _get_inspectors_mock.return_value
 
-        compare("left_uri", "right_uri", ignore_tables=set(['ignore_me']))
+        compare("left_uri", "right_uri", ignores=['ignore_me'])
 
         _get_inspectors_mock.assert_called_once_with("left_uri", "right_uri")
         _get_tables_info_mock.assert_called_once_with(
@@ -309,11 +309,13 @@ class TestCompareInternals(object):
             {'table_data': 'data_A'},
             {'table_data': 'data_B'},
         ]
-        left_inspector, right_inspector = Mock(), Mock()
+        left_inspector, right_inspector, ignore_manager = (
+            Mock(), Mock(), Mock()
+        )
         tables_common = ['common_table_A', 'common_table_B']
 
         tables_data = _get_tables_data(
-            tables_common, left_inspector, right_inspector)
+            tables_common, left_inspector, right_inspector, ignore_manager)
 
         expected_tables_data = {
             'common_table_A': {'table_data': 'data_A'},
@@ -369,7 +371,7 @@ class TestCompareInternals(object):
         left_inspector, right_inspector = Mock(), Mock()
 
         result = _get_foreign_keys_info(
-            left_inspector, right_inspector, 'table_A')
+            left_inspector, right_inspector, 'table_A', [])
 
         _diff_dicts_mock.assert_called_once_with(
             {
@@ -400,7 +402,7 @@ class TestCompareInternals(object):
         left_inspector, right_inspector = Mock(), Mock()
 
         result = _get_primary_keys_info(
-            left_inspector, right_inspector, 'table_A')
+            left_inspector, right_inspector, 'table_A', [])
 
         _diff_dicts_mock.assert_called_once_with(
             {'pk_left_1': 'pk_left_1', 'pk_left_2': 'pk_left_2'},
@@ -426,7 +428,7 @@ class TestCompareInternals(object):
         left_inspector, right_inspector = Mock(), Mock()
 
         result = _get_indexes_info(
-            left_inspector, right_inspector, 'table_A')
+            left_inspector, right_inspector, 'table_A', [])
 
         _diff_dicts_mock.assert_called_once_with(
             {
@@ -462,7 +464,7 @@ class TestCompareInternals(object):
         left_inspector, right_inspector = Mock(), Mock()
 
         result = _get_columns_info(
-            left_inspector, right_inspector, 'table_A')
+            left_inspector, right_inspector, 'table_A', [])
 
         _diff_dicts_mock.assert_called_once_with(
             {
@@ -523,7 +525,9 @@ class TestCompareInternals(object):
             'left_only': 13, 'right_only': 14, 'common': 15, 'diff': 16
         }
 
-        result = _get_table_data(left_inspector, right_inspector, 'table_A')
+        result = _get_table_data(
+            left_inspector, right_inspector, 'table_A', Mock()
+        )
 
         expected_result = {
             'foreign_keys': {

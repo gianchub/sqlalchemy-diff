@@ -110,8 +110,8 @@ class IgnoreManager:
 
     allowed_identifiers = ['pk', 'fk', 'idx', 'col']
 
-    def __init__(self, ignores, separator='.'):
-        self.separator = separator
+    def __init__(self, ignores, separator=None):
+        self.separator = separator or '.'
         self.parse(ignores or [])
 
     def parse(self, ignores):
