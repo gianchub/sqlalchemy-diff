@@ -5,8 +5,8 @@ import uuid
 
 import pytest
 
-from sqlalchemydiff.util import CompareResult, InspectorFactory
-from mock import Mock, patch, call
+from sqlalchemydiff.util import CompareResult, InspectorFactory, IgnoreManager
+from mock import Mock, patch
 
 
 class TestCompareResult(object):
@@ -23,10 +23,10 @@ class TestCompareResult(object):
         info, errors = {}, {}
         result = CompareResult(info, errors)
 
-        assert True == result.is_match
+        assert result.is_match
 
         result.errors = {1: 1}
-        assert False == result.is_match
+        assert not result.is_match
 
     def test_dump_info(self):
         info = {'some': 'info'}
@@ -73,3 +73,201 @@ class TestInspectorFactory(object):
         inspect_mock.assert_called_once_with(create_engine_mock.return_value)
 
         assert inspect_mock.return_value == inspector
+
+
+class TestIgnoreManager:
+
+    @pytest.fixture
+    def ignore_data(self):
+        return [
+            'table-A.pk.id',
+            'table-A.fk.user_id',
+            'table-A.fk.address_id',
+            'table-B.pk.root_id',
+            'table-C.col.telephone',
+            'table-C.idx.admin_id',
+            'table-D',
+            'table-E',
+        ]
+
+    @pytest.mark.parametrize('ignore', [
+        None,
+        [],
+        (),
+    ])
+    def test_init_empty(self, ignore):
+        im = IgnoreManager(ignore)
+
+        assert {} == im.ignore_data
+        assert set() == im.ignore_tables
+
+    def test_init(self, ignore_data):
+        im = IgnoreManager(ignore_data)
+
+        expected_ignore = {
+            'table-A': {
+                'pk': ['id'],
+                'fk': ['user_id', 'address_id'],
+            },
+            'table-B': {
+                'pk': ['root_id'],
+            },
+            'table-C': {
+                'col': ['telephone'],
+                'idx': ['admin_id'],
+            },
+        }
+
+        expected_tables = set(['table-D', 'table-E'])
+
+        assert expected_ignore == im.ignore_data
+        assert expected_tables == im.ignore_tables
+
+    def test_init_alternative_separator(self, ignore_data):
+        ignore_data = [clause.replace('.', '#') for clause in ignore_data]
+        im = IgnoreManager(ignore_data, separator='#')
+
+        expected_ignore = {
+            'table-A': {
+                'pk': ['id'],
+                'fk': ['user_id', 'address_id'],
+            },
+            'table-B': {
+                'pk': ['root_id'],
+            },
+            'table-C': {
+                'col': ['telephone'],
+                'idx': ['admin_id'],
+            },
+        }
+
+        expected_tables = set(['table-D', 'table-E'])
+
+        assert expected_ignore == im.ignore_data
+        assert expected_tables == im.ignore_tables
+
+    def test_ignore_tables_property(self, ignore_data):
+        im = IgnoreManager(ignore_data)
+
+        expected_tables = set(['table-D', 'table-E'])
+
+        assert expected_tables == im.ignore_tables
+
+        # make sure the property returns a copy
+        im.ignore_tables.add('another-table')
+        assert expected_tables == im.ignore_tables
+
+    def test_ignore_data_property(self, ignore_data):
+        im = IgnoreManager(ignore_data)
+
+        expected_ignore = {
+            'table-A': {
+                'pk': ['id'],
+                'fk': ['user_id', 'address_id'],
+            },
+            'table-B': {
+                'pk': ['root_id'],
+            },
+            'table-C': {
+                'col': ['telephone'],
+                'idx': ['admin_id'],
+            },
+        }
+
+        assert expected_ignore == im.ignore_data
+
+        # make sure the property returns a copy
+        im.ignore_data['another-table'] = {'something': 'else'}
+        assert expected_ignore == im.ignore_data
+
+    def test_init_strip(self):
+        ignore_data = ['  table-A  .  pk  .  id  ', '   table-C  ']
+
+        im = IgnoreManager(ignore_data)
+
+        expected_ignore = {
+            'table-A': {
+                'pk': ['id']
+            }
+        }
+
+        expected_tables = set(['table-C'])
+
+        assert expected_ignore == im.ignore_data
+        assert expected_tables == im.ignore_tables
+
+    def test_identifier_incorrect(self):
+        ignore_data = ['table-A.unknown.some-name']
+
+        with pytest.raises(ValueError) as err:
+            IgnoreManager(ignore_data)
+
+        assert (
+            "unknown is invalid. It must be in ['pk', 'fk', 'idx', 'col']",
+        ) == err.value.args
+
+    @pytest.mark.parametrize('clause', [
+            'too.few',
+            'too.many.definitely.for-sure',
+    ])
+    def test_incorrect_clause(self, clause):
+        ignore_data = [clause]
+
+        with pytest.raises(ValueError) as err:
+            IgnoreManager(ignore_data)
+
+        assert (
+            '{} is not a well formed clause: table_name.identifier.name'
+            .format(clause),
+        ) == err.value.args
+
+    @pytest.mark.parametrize('clause', [
+            '.pk.b',
+            'a.pk.',
+    ])
+    def test_incorrect_empty_clause(self, clause):
+        ignore_data = [clause]
+
+        with pytest.raises(ValueError) as err:
+            IgnoreManager(ignore_data)
+
+        assert (
+            '{} is not a well formed clause: table_name.identifier.name'
+            .format(clause),
+        ) == err.value.args
+
+    @pytest.mark.parametrize('clause', [
+        3,
+        3.14159265,
+        [],
+        (),
+        {},
+        None,
+    ])
+    def test_type_error_clause(self, clause):
+        ignore_data = [clause]
+
+        with pytest.raises(TypeError) as err:
+            IgnoreManager(ignore_data)
+
+        assert (
+            '{} is not a string'.format(clause),
+        ) == err.value.args
+
+    def test_get_missing_table(self):
+        ignore_data = []
+
+        im = IgnoreManager(ignore_data)
+
+        assert [] == im.get('some-table-name', 'some-identifier')
+
+    def test_get_missing_identifier(self, ignore_data):
+        im = IgnoreManager(ignore_data)
+
+        assert [] == im.get('table-C', 'pk')
+
+    def test_get(self, ignore_data):
+        im = IgnoreManager(ignore_data)
+
+        assert ['id'] == im.get('table-A', 'pk')
+        assert ['user_id', 'address_id'] == im.get('table-A', 'fk')

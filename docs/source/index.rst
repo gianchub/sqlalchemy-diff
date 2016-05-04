@@ -77,6 +77,20 @@ them by looking at the ``errors`` dict on the ``result``:
             }
 
 
+You can also tell the comparer to ignore parts of the database.
+
+For example, to ignore the ``users`` table completely, and the ``line3`` column
+of the table ``addresses`` you would call ``compare`` like this:
+
+.. code-block:: Python
+
+    >>> result = compare(
+            uri_left,
+            uri_right,
+            ignores=['users', 'addresses.col.line3']
+        )
+
+
 If you wish to persist that dict to a JSON file, you can quickly do so
 by calling ``result.dump_errors()``.
 
@@ -91,6 +105,8 @@ Currently the library can detect the following differences:
 - Differences in **Foreign Keys** for a common table
 - Differences in **Indexes** for a common table
 - Differences in **Columns** for a common table
+- Ability to ignore a **whole table**
+- Ability to ignore **primary/foreign keys**, **indexes** and **columns**
 
 
 Installation

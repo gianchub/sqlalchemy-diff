@@ -3,6 +3,7 @@ from collections import namedtuple
 from uuid import uuid4
 import json
 
+import six
 from sqlalchemy import inspect, create_engine
 from sqlalchemy_utils import create_database, drop_database, database_exists
 
@@ -103,3 +104,75 @@ def prepare_schema_from_models(uri, sqlalchemy_base):
     """Creates the database schema from the ``SQLAlchemy`` models. """
     engine = create_engine(uri)
     sqlalchemy_base.metadata.create_all(engine)
+
+
+class IgnoreManager:
+
+    allowed_identifiers = ['pk', 'fk', 'idx', 'col']
+
+    def __init__(self, ignores, separator=None):
+        self.separator = separator or '.'
+        self.parse(ignores or [])
+
+    def parse(self, ignores):
+        ignore, tables = {}, set()
+
+        for data in ignores:
+            self.validate_type(data)
+
+            if self.is_table_name(data):
+                tables.add(data.strip())
+            else:
+                self.validate_clause(data)
+                table_name, identifier, name = self.fetch_data_items(data)
+                self.validate_items(table_name, identifier, name)
+
+                ignore.setdefault(
+                    table_name, {}
+                ).setdefault(identifier, []).append(name)
+
+        self.__ignore = ignore
+        self.__tables = tables
+
+    def is_table_name(self, data):
+        return data.count(self.separator) == 0
+
+    def validate_type(self, data):
+        if not isinstance(data, six.string_types):
+            raise TypeError('{} is not a string'.format(data))
+
+    def validate_clause(self, data):
+        if len(data.split(self.separator)) != 3:
+            raise ValueError(
+                '{} is not a well formed clause: table_name.identifier.name'
+                .format(data)
+            )
+
+    def fetch_data_items(self, data):
+        return [item.strip() for item in data.split(self.separator)]
+
+    def validate_items(self, table_name, identifier, name):
+        if identifier not in self.allowed_identifiers:
+            raise ValueError(
+                '{} is invalid. It must be in {}'.format(
+                    identifier, self.allowed_identifiers
+                )
+            )
+
+        items = (table_name, identifier, name)
+        if not all(items):
+            raise ValueError(
+                '{} is not a well formed clause: table_name.identifier.name'
+                .format(self.separator.join(items))
+            )
+
+    def get(self, table_name, identifier):
+        return self.__ignore.get(table_name, {}).get(identifier, [])
+
+    @property
+    def ignore_tables(self):
+        return self.__tables.copy()
+
+    @property
+    def ignore_data(self):
+        return self.__ignore.copy()
