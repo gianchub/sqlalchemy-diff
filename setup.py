@@ -13,7 +13,7 @@ with open(os.path.join(here, 'README.rst'), 'r', 'utf-8') as stream:
 
 setup(
     name='sqlalchemy-diff',
-    version='0.1.0',
+    version='0.1.1',
     description='Compare two database schemas using sqlalchemy.',
     long_description=readme,
     author='student.com',
@@ -24,7 +24,7 @@ setup(
         "six==1.10.0",
         "mock>=2.0.0",
         "sqlalchemy-utils==0.32.4",
-        "pyyaml==3.11",
+        "pyyaml>=3.11",
     ],
     extras_require={
         'dev': [
