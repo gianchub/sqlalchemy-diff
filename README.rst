@@ -6,4 +6,8 @@ SQLAlchemy Diff
     Compare and generate a diff between two databases using SQLAlchemy's
     inspection API.
 
-Documentation here: (link to read the docs)
+
+License
+-------
+
+Apache 2.0. See LICENSE for details.
