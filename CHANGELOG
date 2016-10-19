@@ -1,0 +1,10 @@
+Version 0.1.2
+-------------
+
+Released 2016-10-19
+
+* Relaxed package versions so that they are not pinned down unless it is necessary.
+* Stopped using static YAML files to set test parameters and started using pytest parser instead.
+* Makefile added.
+* CHANGELOG added.
+* README documentation updated.

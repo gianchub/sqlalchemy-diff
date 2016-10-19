@@ -13,7 +13,7 @@ with open(os.path.join(here, 'README.rst'), 'r', 'utf-8') as stream:
 
 setup(
     name='sqlalchemy-diff',
-    version='0.1.1',
+    version='0.1.2',
     description='Compare two database schemas using sqlalchemy.',
     long_description=readme,
     author='student.com',
@@ -21,15 +21,16 @@ setup(
     url='https://github.com/Overseas-Student-Living/sqlalchemy-diff',
     packages=find_packages(exclude=['docs', 'test', 'test.*']),
     install_requires=[
-        "six==1.10.0",
-        "mock>=2.0.0",
-        "sqlalchemy-utils==0.32.4",
-        "pyyaml>=3.11",
+        "six>=1.10.0",
+        "sqlalchemy-utils>=0.32.4",
     ],
     extras_require={
         'dev': [
+            "mock==2.0.0",
             "mysql-connector-python==2.0.4",
-            "pytest==2.9.1",
+            "pytest==3.0.3",
+            "flake8==3.0.4",
+            "coverage==4.2",
         ],
         'docs': [
             "sphinx==1.4.1",
