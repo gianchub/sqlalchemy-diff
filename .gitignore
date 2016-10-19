@@ -4,3 +4,4 @@
 .cache
 .tox
 docs/build
+htmlcov
