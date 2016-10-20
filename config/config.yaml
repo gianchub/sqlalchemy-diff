@@ -1,2 +1,0 @@
-DB_URIS:
-    "test": "mysql+mysqlconnector://root:password@dockermachine:3306/sqlalchemydiff"
