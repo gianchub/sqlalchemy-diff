@@ -12,12 +12,12 @@ def pytest_addoption(parser):
         action='store',
         dest='TEST_DB_URL',
         default=(
-            'mysql+mysqlconnector://root:password@localhost:3306/'
+            'mysql+mysqlconnector://root:@localhost:3306/'
             'sqlalchemydiff'
         ),
         help=(
             'DB url for testing (e.g. '
-            '"mysql+mysqlconnector://root:password@localhost:3306/'
+            '"mysql+mysqlconnector://root:@localhost:3306/'
             'sqlalchemydiff''")'
         )
     )

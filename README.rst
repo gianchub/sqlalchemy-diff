@@ -7,26 +7,37 @@ SQLAlchemy Diff
     inspection API.
 
 
+Documentation
+-------------
+
+See `<http://sqlalchemy-diff.readthedocs.org>`_.
+
+
 Running tests
 -------------
 
-Makefile targets that can be used to run the tests.
+Tests are written with pytest. Makefile targets to invoke tests are also provided for convenience.
 
 Test databases will be created, used during the tests and destroyed afterwards.
 
-Example of usage:
+Example:
 
 .. code-block:: shell
 
     $ # using default settings
-    $ pytest test
     $ make test
-    $ make coverage
 
-    $ # or overridding the database URI
-    $ pytest test --test-db-url=mysql+mysqlconnector://root:password@localhost:3306/sqlalchemydiff
+    # or
+    $ py.test test
+
+    $ # overridding the database URI
+    $ py.test test --test-db-url=mysql+mysqlconnector://root:password@localhost:3306/sqlalchemydiff
+
+    # or
     $ make test ARGS="--test-db-url=mysql+mysqlconnector://root:password@localhost:3306/sqlalchemydiff"
-    $ make coverage ARGS="--lf -x -vv --test-db-url=mysql+mysqlconnector://root:password@localhost:3306/sqlalchemydiff"
+
+    # providing other pytest args via Make
+    $ make test ARGS="--lf -x -vv"
 
 
 License

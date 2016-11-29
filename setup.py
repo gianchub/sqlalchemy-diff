@@ -29,6 +29,7 @@ setup(
             "mock==2.0.0",
             "mysql-connector-python==2.0.4",
             "pytest==3.0.3",
+            "pylint==1.5.1",
             "flake8==3.0.4",
             "coverage==4.2",
         ],
