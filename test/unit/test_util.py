@@ -52,6 +52,13 @@ class TestCompareResult(object):
 
         os.unlink(filename)
 
+    def test_dump_with_null_filename(self):
+        errors = {'some': 'errors'}
+        result = CompareResult({}, errors)
+
+        expected_dump = json.dumps(errors, indent=4, sort_keys=True)
+        assert result.dump_errors(filename=None) == expected_dump
+
 
 class TestInspectorFactory(object):
 
