@@ -24,6 +24,9 @@ setup(
         "six>=1.10.0",
         "sqlalchemy-utils>=0.32.4",
     ],
+    dependency_links=[
+        'http://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-2.1.4.zip'
+    ],
     extras_require={
         'dev': [
             "mock==2.0.0",
