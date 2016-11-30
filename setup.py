@@ -44,7 +44,8 @@ setup(
     license='Apache License, Version 2.0',
     classifiers=[
         "Programming Language :: Python",
-        "Operating System :: Linux",
+        "Operating System :: POSIX",
+        "Operating System :: MacOS :: MacOS X",
         "Programming Language :: Python :: 2",
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
