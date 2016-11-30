@@ -1,7 +1,5 @@
 .PHONY: test
 
-HTMLCOV_DIR ?= htmlcov
-
 test: flake8 pylint pytest
 
 pylint:
