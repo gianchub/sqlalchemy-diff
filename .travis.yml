@@ -18,3 +18,4 @@ deploy:
   on:
     tags: true
     repo: Overseas-Student-Living/sqlalchemy-diff
+  distributions: "sdist bdist_wheel"
