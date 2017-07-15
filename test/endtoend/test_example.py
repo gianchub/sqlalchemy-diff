@@ -108,6 +108,39 @@ def test_errors_dict_catches_all_differences(uri_left, uri_right):
                 }
             },
             'employees': {
+                'columns': {
+                    'diff': [
+                        {
+                            'key': 'polarity',
+                            'left': {
+                                'default': None,
+                                'name': 'polarity',
+                                'nullable': True,
+                                'type': "ENUM('NEGATIVE','POSITIVE')"},
+                            'right': {
+                                'default': None,
+                                'name': 'polarity',
+                                'nullable': True,
+                                'type': "ENUM('NEG','POS')"
+                            }
+                        },
+                        {
+                            'key': 'spin',
+                            'left': {
+                                'default': None,
+                                'name': 'spin',
+                                'nullable': True,
+                                'type': 'VARCHAR(9)'
+                            },
+                            'right': {
+                                'default': None,
+                                'name': 'spin',
+                                'nullable': True,
+                                'type': 'VARCHAR(4)'
+                            }
+                        }
+                    ]
+                },
                 'foreign_keys': {
                     'left_only': [
                         {
@@ -215,6 +248,8 @@ def test_errors_dict_catches_all_differences(uri_left, uri_right):
                 }
             }
         },
+        'enums': {
+        },
         'uris': {
             'left': uri_left,
             'right': uri_right,
@@ -299,6 +334,8 @@ def test_ignores(uri_left, uri_right):
         'phone_numbers',
         'companies.col.name',
         'companies.idx.name',
+        'employees.col.polarity',
+        'employees.col.spin',
         'employees.fk.fk_employees_companies',
         'employees.fk.fk_emp_comp',
         'employees.idx.ix_employees_name',
@@ -330,6 +367,8 @@ def test_ignores_alternative_sep(uri_left, uri_right):
         'phone_numbers',
         'companies#col#name',
         'companies#idx#name',
+        'employees#col#polarity',
+        'employees#col#spin',
         'employees#fk#fk_employees_companies',
         'employees#fk#fk_emp_comp',
         'employees#idx#ix_employees_name',
