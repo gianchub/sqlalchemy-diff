@@ -278,21 +278,34 @@ def _get_foreign_keys(inspector, table_name):
 def _get_primary_keys_info(
     left_inspector, right_inspector, table_name, ignores
 ):
-    left_pk_list = _get_primary_keys(left_inspector, table_name)
-    right_pk_list = _get_primary_keys(right_inspector, table_name)
+    left_pk_constraint = _get_primary_keys(left_inspector, table_name)
+    right_pk_constraint = _get_primary_keys(right_inspector, table_name)
 
-    left_pk_list = _discard_ignores(left_pk_list, ignores)
-    right_pk_list = _discard_ignores(right_pk_list, ignores)
+    pk_constraint_has_name = 'name' in left_pk_constraint
 
-    # process into dict
-    left_pk = dict((elem, elem) for elem in left_pk_list)
-    right_pk = dict((elem, elem) for elem in right_pk_list)
+    if pk_constraint_has_name:
+        left_pk = ({left_pk_constraint['name']: left_pk_constraint}
+                   if _discard_ignores_by_name([left_pk_constraint], ignores)
+                   else {})
+        right_pk = ({right_pk_constraint['name']: right_pk_constraint}
+                    if _discard_ignores_by_name([right_pk_constraint], ignores)
+                    else {})
+    else:
+        left_pk_list = left_pk_constraint['constrained_columns']
+        right_pk_list = right_pk_constraint['constrained_columns']
+
+        left_pk_list = _discard_ignores(left_pk_list, ignores)
+        right_pk_list = _discard_ignores(right_pk_list, ignores)
+
+        # process into dict
+        left_pk = dict((elem, elem) for elem in left_pk_list)
+        right_pk = dict((elem, elem) for elem in right_pk_list)
 
     return _diff_dicts(left_pk, right_pk)
 
 
 def _get_primary_keys(inspector, table_name):
-    return inspector.get_primary_keys(table_name)
+    return inspector.get_pk_constraint(table_name)
 
 
 def _get_indexes_info(left_inspector, right_inspector, table_name, ignores):
