@@ -24,13 +24,10 @@ setup(
         "six>=1.10.0",
         "sqlalchemy-utils>=0.32.4",
     ],
-    dependency_links=[
-        'https://cdn.mysql.com/Downloads/Connector-Python/mysql-connector-python-2.1.4.zip'
-    ],
     extras_require={
         'dev': [
             "mock==2.0.0",
-            "mysql-connector-python==2.1.4",
+            "mysql-connector-python-rf==2.2.2",
             "pytest==3.0.3",
             "pylint==1.5.1",
             "flake8==3.0.4",
@@ -51,6 +48,8 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.3",
         "Programming Language :: Python :: 3.4",
+        "Programming Language :: Python :: 3.5",
+        "Programming Language :: Python :: 3.6",
         "Topic :: Internet",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Intended Audience :: Developers",
