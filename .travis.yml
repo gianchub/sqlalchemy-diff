@@ -1,21 +1,40 @@
 sudo: false
 language: python
-python:
-- '2.7'
+
+services:
+  - mysql
+
 install:
-- pip install tox
-env:
-- TOX_ENV=py27-test
-- TOX_ENV=py33-test
-- TOX_ENV=py34-test
+  - pip install tox
+
+matrix:
+  include:
+    - stage: test
+      python: 2.7
+      env: TOX_ENV=py27
+    - stage: test
+      python: 3.3
+      env: TOX_ENV=py33
+    - stage: test
+      python: 3.4
+      env: TOX_ENV=py34
+    - stage: test
+      python: 3.5
+      env: TOX_ENV=py35
+    - stage: test
+      python: 3.6
+      env: TOX_ENV=py36
+    - stage: deploy
+      script: skip
+      deploy:
+        provider: pypi
+        user: mattbennett
+        password:
+          secure: "nS/snIn4e/AWu3yrpzDLPXB+wHXXVU0qLdf07ldUxBx3lJ5K4ggqM1o6huP+ny2lZM6Q+jlRaYj0L6Tb/pppC7Pimx+dni9EFHXvLVO5sLD80+qV/AQPf7tbdWY6FWBV8kMGpXPwdnbKRGnQ17nerBJUfvL0dxigGoAqpOgwxppw/qNk0J3ay2AUnKUnWUKUXgATBLH72MSW6/iT84asIV6jOlfmRLpFKiO42emyBmYTo/TwM6lkjLG465gI2oWc/2sVTR6rkq00Yz5AC3Ry/pUZYfg55M3hTgHSQ54qtd/7IlbsP9inYTiZGsYkDaHlKsM1DdXreApVIo7LzRfCblMGrGvQfZm3BVMmmOWGSzM9dqBOXxjVcG9xHoG4/jzxGJ40gXX4cRS0AgkAWak2Q34QKj30FIBeLrZNzpDUmyPrKFBkfLi8CR8pW06m0Kxs3XWoUvP7ajVocbGnQHXQpz4q7FoKmnXhg0u9XyJTdtZAMt/h7aN9Bb2N0Zfasex025dB93Z2qLmwMVYkwQhIxjfw4vCstq9t+q67JKDMP4O6T7ektJ1Qt2TNR2BEr0/V/r5uplH5qyNH8PKL5YV9afyI+f1Dbdk+8wsRBGFJOm+rHg/JLtkzpTjNeAy4VYsYb8R+1rRe9IyBR7ti0mpW22lemhAHUUdaaol7mZm5yTI="
+        on:
+          tags: true
+          repo: Overseas-Student-Living/sqlalchemy-diff
+        distributions: "sdist bdist_wheel"
+
 script:
-- tox -e $TOX_ENV
-deploy:
-  provider: pypi
-  user: mattbennett
-  password:
-    secure: nS/snIn4e/AWu3yrpzDLPXB+wHXXVU0qLdf07ldUxBx3lJ5K4ggqM1o6huP+ny2lZM6Q+jlRaYj0L6Tb/pppC7Pimx+dni9EFHXvLVO5sLD80+qV/AQPf7tbdWY6FWBV8kMGpXPwdnbKRGnQ17nerBJUfvL0dxigGoAqpOgwxppw/qNk0J3ay2AUnKUnWUKUXgATBLH72MSW6/iT84asIV6jOlfmRLpFKiO42emyBmYTo/TwM6lkjLG465gI2oWc/2sVTR6rkq00Yz5AC3Ry/pUZYfg55M3hTgHSQ54qtd/7IlbsP9inYTiZGsYkDaHlKsM1DdXreApVIo7LzRfCblMGrGvQfZm3BVMmmOWGSzM9dqBOXxjVcG9xHoG4/jzxGJ40gXX4cRS0AgkAWak2Q34QKj30FIBeLrZNzpDUmyPrKFBkfLi8CR8pW06m0Kxs3XWoUvP7ajVocbGnQHXQpz4q7FoKmnXhg0u9XyJTdtZAMt/h7aN9Bb2N0Zfasex025dB93Z2qLmwMVYkwQhIxjfw4vCstq9t+q67JKDMP4O6T7ektJ1Qt2TNR2BEr0/V/r5uplH5qyNH8PKL5YV9afyI+f1Dbdk+8wsRBGFJOm+rHg/JLtkzpTjNeAy4VYsYb8R+1rRe9IyBR7ti0mpW22lemhAHUUdaaol7mZm5yTI=
-  on:
-    tags: true
-    repo: Overseas-Student-Living/sqlalchemy-diff
-  distributions: "sdist bdist_wheel"
+  - tox -e $TOX_ENV
