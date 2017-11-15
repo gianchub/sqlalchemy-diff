@@ -3,7 +3,7 @@
 test: flake8 pylint pytest
 
 pylint:
-	pylint sqlalchemydiff -E
+	pylint sqlalchemydiff -E --disable=E1102
 
 flake8:
 	flake8 sqlalchemydiff test
