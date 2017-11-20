@@ -281,7 +281,8 @@ def _get_primary_keys_info(
     left_pk_constraint = _get_primary_keys(left_inspector, table_name)
     right_pk_constraint = _get_primary_keys(right_inspector, table_name)
 
-    pk_constraint_has_name = 'name' in left_pk_constraint
+    pk_constraint_has_name = ('name' in left_pk_constraint and
+                              left_pk_constraint['name'] is not None)
 
     if pk_constraint_has_name:
         left_pk = ({left_pk_constraint['name']: left_pk_constraint}
