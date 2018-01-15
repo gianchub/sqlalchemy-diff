@@ -371,7 +371,9 @@ def _get_constraints_info(left_inspector, right_inspector,
 def _get_constraints_data(inspector, table_name):
     try:
         return inspector.get_check_constraints(table_name)
-    except NotImplementedError:
+    except (AttributeError, NotImplementedError):
+        # sqlalchemy < 1.1.0
+        # or a dialect that doesn't implement get_check_constraints
         return []
 
 
@@ -391,6 +393,7 @@ def _get_enums_info(left_inspector, right_inspector, ignores):
 
 def _get_enums_data(inspector):
     try:
+        # as of 1.2.0, PostgreSQL dialect only; see PGInspector
         return inspector.get_enums()
     except AttributeError:
         return []
