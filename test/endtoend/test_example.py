@@ -332,6 +332,7 @@ def test_ignores(uri_left, uri_right):
     ignores = [
         'mobile_numbers',
         'phone_numbers',
+        '*.enum.polarity',
         'companies.col.name',
         'companies.idx.name',
         'employees.col.polarity',
@@ -365,6 +366,7 @@ def test_ignores_alternative_sep(uri_left, uri_right):
     ignores = [
         'mobile_numbers',
         'phone_numbers',
+        '*#enum#polarity',
         'companies#col#name',
         'companies#idx#name',
         'employees#col#polarity',
@@ -392,6 +394,7 @@ def test_ignores_alternative_sep(uri_left, uri_right):
 @pytest.mark.parametrize('missing_ignore', [
     'mobile_numbers',
     'phone_numbers',
+    '*.enum.polarity',
     'companies.col.name',
     'companies.idx.name',
     'employees.fk.fk_employees_companies',
@@ -414,6 +417,7 @@ def test_ignores_all_needed(uri_left, uri_right, missing_ignore):
     ignores = [
         'mobile_numbers',
         'phone_numbers',
+        '*.enum.polarity',
         'companies.col.name',
         'companies.idx.name',
         'employees.fk.fk_employees_companies',
