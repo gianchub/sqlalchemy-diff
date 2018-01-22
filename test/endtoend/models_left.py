@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import enum
 
-from sqlalchemy import Column, Enum, ForeignKey, Integer, String, Unicode
+from sqlalchemy import Column, ForeignKey, Integer, String, Unicode
 from sqlalchemy.ext.declarative import declarative_base
+
+from .enumadaptor import Enum
 
 
 Base = declarative_base()
