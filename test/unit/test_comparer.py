@@ -450,8 +450,8 @@ class TestCompareInternals(object):
     def test__get_primary_keys_info(
             self, _diff_dicts_mock, _get_primary_keys_mock):
         _get_primary_keys_mock.side_effect = [
-            ['pk_left_1', 'pk_left_2'],
-            ['pk_right_1']
+            {'constrained_columns': ['pk_left_1', 'pk_left_2']},
+            {'constrained_columns': ['pk_right_1']}
         ]
         left_inspector, right_inspector = Mock(), Mock()
 
@@ -468,8 +468,8 @@ class TestCompareInternals(object):
     def test__get_primary_keys_info_ignores(
             self, _diff_dicts_mock, _get_primary_keys_mock):
         _get_primary_keys_mock.side_effect = [
-            ['pk_left_1', 'pk_left_2'],
-            ['pk_right_1', 'pk_right_2']
+            {'constrained_columns': ['pk_left_1', 'pk_left_2']},
+            {'constrained_columns': ['pk_right_1', 'pk_right_2']},
         ]
         left_inspector, right_inspector = Mock(), Mock()
         ignores = ['pk_left_1', 'pk_right_2']
@@ -484,13 +484,58 @@ class TestCompareInternals(object):
 
         assert _diff_dicts_mock.return_value == result
 
+    def test__get_primary_keys_info_with_pk_constraint_name(
+            self, _diff_dicts_mock, _get_primary_keys_mock):
+        _get_primary_keys_mock.side_effect = [
+            {'name': 'left', 'constrained_columns': ['pk_left_1']},
+            {'name': 'right', 'constrained_columns': ['pk_right_1']}
+        ]
+        left_inspector, right_inspector = Mock(), Mock()
+
+        result = _get_primary_keys_info(
+            left_inspector, right_inspector, 'table_A', [])
+
+        _diff_dicts_mock.assert_called_once_with(
+            {
+                'left': {'name': 'left',
+                         'constrained_columns': ['pk_left_1']}
+            },
+            {
+                'right': {'name': 'right',
+                          'constrained_columns': ['pk_right_1']}
+            }
+        )
+        assert _diff_dicts_mock.return_value == result
+
+    def test__get_primary_keys_info_ignores_with_pk_constraint_name(
+            self, _diff_dicts_mock, _get_primary_keys_mock):
+        _get_primary_keys_mock.side_effect = [
+            {'name': 'left_1', 'constrained_columns': ['pk_left_1']},
+            {'name': 'right_1', 'constrained_columns': ['pk_right_1']},
+        ]
+        left_inspector, right_inspector = Mock(), Mock()
+        ignores = ['left_1', 'left_2', 'right_2']
+
+        result = _get_primary_keys_info(
+            left_inspector, right_inspector, 'table_A', ignores)
+
+        _diff_dicts_mock.assert_called_once_with(
+            dict(),
+            {
+                'right_1': {'name': 'right_1',
+                            'constrained_columns': ['pk_right_1']},
+            }
+        )
+
+        assert _diff_dicts_mock.return_value == result
+
     def test__get_primary_keys(self):
         inspector = Mock()
 
         result = _get_primary_keys(inspector, 'table_A')
 
-        inspector.get_primary_keys.assert_called_once_with('table_A')
-        assert inspector.get_primary_keys.return_value == result
+        inspector.get_pk_constraint.assert_called_once_with('table_A')
+        assert inspector.get_pk_constraint.return_value == result
 
     def test__get_indexes_info(
             self, _diff_dicts_mock, _get_indexes_mock):
