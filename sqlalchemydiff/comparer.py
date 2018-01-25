@@ -93,6 +93,12 @@ def compare(left_uri, right_uri, ignores=None, ignores_sep=None):
         tables_info.common, left_inspector, right_inspector, ignore_manager
     )
 
+    info['enums'] = _get_enums_info(
+        left_inspector,
+        right_inspector,
+        ignore_manager.get('*', 'enum'),
+    )
+
     errors = _compile_errors(info)
     result = _make_result(info, errors)
 
@@ -161,6 +167,7 @@ def _get_info_dict(left_uri, right_uri, tables_info):
             'common': tables_info.common,
         },
         'tables_data': {},
+        'enums': {},
     }
 
     return info
@@ -212,6 +219,13 @@ def _get_table_data(
         right_inspector,
         table_name,
         ignore_manager.get(table_name, 'col')
+    )
+
+    table_data['constraints'] = _get_constraints_info(
+        left_inspector,
+        right_inspector,
+        table_name,
+        ignore_manager.get(table_name, 'cons')
     )
 
     return table_data
@@ -335,6 +349,56 @@ def _get_columns(inspector, table_name):
     return inspector.get_columns(table_name)
 
 
+def _get_constraints_info(left_inspector, right_inspector,
+                          table_name, ignores):
+    left_constraints_list = _get_constraints_data(left_inspector, table_name)
+    right_constraints_list = _get_constraints_data(right_inspector, table_name)
+
+    left_constraints_list = _discard_ignores_by_name(left_constraints_list,
+                                                     ignores)
+    right_constraints_list = _discard_ignores_by_name(right_constraints_list,
+                                                      ignores)
+
+    # process into dict
+    left_constraints = dict((elem['name'], elem)
+                            for elem in left_constraints_list)
+    right_constraints = dict((elem['name'], elem)
+                             for elem in right_constraints_list)
+
+    return _diff_dicts(left_constraints, right_constraints)
+
+
+def _get_constraints_data(inspector, table_name):
+    try:
+        return inspector.get_check_constraints(table_name)
+    except (AttributeError, NotImplementedError):  # pragma: no cover
+        # sqlalchemy < 1.1.0
+        # or a dialect that doesn't implement get_check_constraints
+        return []
+
+
+def _get_enums_info(left_inspector, right_inspector, ignores):
+    left_enums_list = _get_enums_data(left_inspector)
+    right_enums_list = _get_enums_data(right_inspector)
+
+    left_enums_list = _discard_ignores_by_name(left_enums_list, ignores)
+    right_enums_list = _discard_ignores_by_name(right_enums_list, ignores)
+
+    # process into dict
+    left_enums = dict((elem['name'], elem) for elem in left_enums_list)
+    right_enums = dict((elem['name'], elem) for elem in right_enums_list)
+
+    return _diff_dicts(left_enums, right_enums)
+
+
+def _get_enums_data(inspector):
+    try:
+        # as of 1.2.0, PostgreSQL dialect only; see PGInspector
+        return inspector.get_enums()
+    except AttributeError:
+        return []
+
+
 def _discard_ignores_by_name(items, ignores):
     return [item for item in items if item['name'] not in ignores]
 
@@ -364,6 +428,7 @@ def _compile_errors(info):
     errors_template = {
         'tables': {},
         'tables_data': {},
+        'enums': {},
     }
     errors = deepcopy(errors_template)
 
@@ -375,7 +440,8 @@ def _compile_errors(info):
         errors['tables']['right_only'] = info['tables']['right_only']
 
     # then check if there is a discrepancy in the data for each table
-    keys = ['foreign_keys', 'primary_keys', 'indexes', 'columns']
+    keys = ['foreign_keys', 'primary_keys', 'indexes', 'columns',
+            'constraints']
     subkeys = ['left_only', 'right_only', 'diff']
 
     for table_name in info['tables_data']:
@@ -385,6 +451,10 @@ def _compile_errors(info):
                     table_d = errors['tables_data'].setdefault(table_name, {})
                     table_d.setdefault(key, {})[subkey] = info[
                         'tables_data'][table_name][key][subkey]
+
+    for subkey in subkeys:
+        if info['enums'][subkey]:
+            errors['enums'][subkey] = info['enums'][subkey]
 
     if errors != errors_template:
         errors['uris'] = info['uris']

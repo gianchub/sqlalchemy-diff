@@ -2,6 +2,7 @@
 import json
 
 import pytest
+from sqlalchemy import create_engine
 
 from sqlalchemydiff.comparer import compare
 from sqlalchemydiff.util import (
@@ -108,6 +109,39 @@ def test_errors_dict_catches_all_differences(uri_left, uri_right):
                 }
             },
             'employees': {
+                'columns': {
+                    'diff': [
+                        {
+                            'key': 'polarity',
+                            'left': {
+                                'default': None,
+                                'name': 'polarity',
+                                'nullable': True,
+                                'type': "ENUM('NEGATIVE','POSITIVE')"},
+                            'right': {
+                                'default': None,
+                                'name': 'polarity',
+                                'nullable': True,
+                                'type': "ENUM('NEG','POS')"
+                            }
+                        },
+                        {
+                            'key': 'spin',
+                            'left': {
+                                'default': None,
+                                'name': 'spin',
+                                'nullable': True,
+                                'type': 'VARCHAR(9)'
+                            },
+                            'right': {
+                                'default': None,
+                                'name': 'spin',
+                                'nullable': True,
+                                'type': 'VARCHAR(4)'
+                            }
+                        }
+                    ]
+                },
                 'foreign_keys': {
                     'left_only': [
                         {
@@ -215,11 +249,26 @@ def test_errors_dict_catches_all_differences(uri_left, uri_right):
                 }
             }
         },
+        'enums': {
+        },
         'uris': {
             'left': uri_left,
             'right': uri_right,
         }
     }
+
+    engine = create_engine(uri_left)
+    dialect = engine.dialect
+    if getattr(dialect, 'supports_comments', False):
+        # sqlalchemy 1.2.0 adds support for SQL comments
+        # expect them in the errors when supported
+        for table in expected_errors['tables_data'].values():
+            for column in table['columns']['diff']:
+                for side in ['left', 'right']:
+                    column[side].update(comment=None)
+            for side in ['left_only', 'right_only']:
+                for column in table['columns'].get(side, []):
+                    column.update(comment=None)
 
     assert not result.is_match
 
@@ -297,8 +346,11 @@ def test_ignores(uri_left, uri_right):
     ignores = [
         'mobile_numbers',
         'phone_numbers',
+        '*.enum.polarity',
         'companies.col.name',
         'companies.idx.name',
+        'employees.col.polarity',
+        'employees.col.spin',
         'employees.fk.fk_employees_companies',
         'employees.fk.fk_emp_comp',
         'employees.idx.ix_employees_name',
@@ -328,8 +380,11 @@ def test_ignores_alternative_sep(uri_left, uri_right):
     ignores = [
         'mobile_numbers',
         'phone_numbers',
+        '*#enum#polarity',
         'companies#col#name',
         'companies#idx#name',
+        'employees#col#polarity',
+        'employees#col#spin',
         'employees#fk#fk_employees_companies',
         'employees#fk#fk_emp_comp',
         'employees#idx#ix_employees_name',
@@ -353,6 +408,7 @@ def test_ignores_alternative_sep(uri_left, uri_right):
 @pytest.mark.parametrize('missing_ignore', [
     'mobile_numbers',
     'phone_numbers',
+    '*.enum.polarity',
     'companies.col.name',
     'companies.idx.name',
     'employees.fk.fk_employees_companies',
@@ -375,6 +431,7 @@ def test_ignores_all_needed(uri_left, uri_right, missing_ignore):
     ignores = [
         'mobile_numbers',
         'phone_numbers',
+        '*.enum.polarity',
         'companies.col.name',
         'companies.idx.name',
         'employees.fk.fk_employees_companies',

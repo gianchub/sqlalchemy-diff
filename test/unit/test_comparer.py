@@ -93,9 +93,15 @@ class TestCompareCallsChain(object):
             )
             yield m
 
+    @pytest.yield_fixture
+    def _get_enums_data_mock(self):
+        with patch('sqlalchemydiff.comparer._get_enums_data') as m:
+            m.return_value = []
+            yield m
+
     def test_compare_calls_chain(
             self, _get_tables_info_mock, _get_tables_data_mock,
-            _compile_errors_mock):
+            _get_enums_data_mock, _compile_errors_mock):
         """By inspecting `info` and `errors` at the end, we automatically
         check that the whole process works as expected.  What this test
         leaves out is the verifications about inspectors.
@@ -134,6 +140,12 @@ class TestCompareCallsChain(object):
                     'data': 'some-data-B',
                 },
             },
+            'enums': {
+                'left_only': [],
+                'right_only': [],
+                'common': [],
+                'diff': [],
+            },
         }
 
         expected_errors = expected_info.copy()
@@ -144,7 +156,8 @@ class TestCompareCallsChain(object):
 
     def test__get_tables_info_called_with_correct_inspectors(
             self, _get_inspectors_mock, _get_tables_info_mock,
-            _get_tables_data_mock, _compile_errors_mock):
+            _get_tables_data_mock, _get_enums_data_mock,
+            _compile_errors_mock):
         left_inspector, right_inspector = _get_inspectors_mock.return_value
 
         compare("left_uri", "right_uri", ignores=['ignore_me'])
@@ -217,6 +230,11 @@ class TestCompareInternals(object):
     @pytest.yield_fixture
     def _get_columns_info_mock(self):
         with patch('sqlalchemydiff.comparer._get_columns_info') as m:
+            yield m
+
+    @pytest.yield_fixture
+    def _get_constraints_info_mock(self):
+        with patch('sqlalchemydiff.comparer._get_constraints_info') as m:
             yield m
 
     # TESTS
@@ -302,6 +320,7 @@ class TestCompareInternals(object):
                 'common': ['C'],
             },
             'tables_data': {},
+            'enums': {},
         }
 
         assert expected_info == info
@@ -616,7 +635,8 @@ class TestCompareInternals(object):
 
     def test__get_table_data(
             self, _get_foreign_keys_info_mock, _get_primary_keys_info_mock,
-            _get_indexes_info_mock, _get_columns_info_mock):
+            _get_indexes_info_mock, _get_columns_info_mock,
+            _get_constraints_info_mock):
         left_inspector, right_inspector = Mock(), Mock()
 
         _get_foreign_keys_info_mock.return_value = {
@@ -630,6 +650,9 @@ class TestCompareInternals(object):
         }
         _get_columns_info_mock.return_value = {
             'left_only': 13, 'right_only': 14, 'common': 15, 'diff': 16
+        }
+        _get_constraints_info_mock.return_value = {
+            'left_only': 17, 'right_only': 18, 'common': 19, 'diff': 20
         }
 
         result = _get_table_data(
@@ -660,6 +683,12 @@ class TestCompareInternals(object):
                 'right_only': 14,
                 'common': 15,
                 'diff': 16,
+            },
+            'constraints': {
+                'left_only': 17,
+                'right_only': 18,
+                'common': 19,
+                'diff': 20,
             },
         }
 
@@ -704,6 +733,12 @@ class TestCompareInternals(object):
                         'right_only': 14,
                         'common': 15,
                         'diff': 16,
+                    },
+                    'constraints': {
+                        'left_only': 17,
+                        'right_only': 18,
+                        'common': 19,
+                        'diff': 20,
                     }
                 },
 
@@ -731,8 +766,20 @@ class TestCompareInternals(object):
                         'right_only': 14,
                         'common': 15,
                         'diff': 16,
+                    },
+                    'constraints': {
+                        'left_only': 17,
+                        'right_only': 18,
+                        'common': 19,
+                        'diff': 20,
                     }
                 }
+            },
+            'enums': {
+                'left_only': 21,
+                'right_only': 22,
+                'common': 23,
+                'diff': 24,
             }
         }
 
@@ -766,6 +813,11 @@ class TestCompareInternals(object):
                         'left_only': 13,
                         'right_only': 14,
                         'diff': 16,
+                    },
+                    'constraints': {
+                        'left_only': 17,
+                        'right_only': 18,
+                        'diff': 20,
                     }
                 },
 
@@ -789,8 +841,18 @@ class TestCompareInternals(object):
                         'left_only': 13,
                         'right_only': 14,
                         'diff': 16,
+                    },
+                    'constraints': {
+                        'left_only': 17,
+                        'right_only': 18,
+                        'diff': 20,
                     }
                 }
+            },
+            'enums': {
+                'left_only': 21,
+                'right_only': 22,
+                'diff': 24,
             }
         }
 
@@ -837,7 +899,19 @@ class TestCompareInternals(object):
                         'common': 4,
                         'diff': [],
                     },
+                    'constraints': {
+                        'left_only': [],
+                        'right_only': [],
+                        'common': 5,
+                        'diff': [],
+                    },
                 }
+            },
+            'enums': {
+                'left_only': [],
+                'right_only': [],
+                'common': 6,
+                'diff': [],
             }
         }
 

@@ -210,12 +210,13 @@ class TestIgnoreManager:
             IgnoreManager(ignore_data)
 
         assert (
-            "unknown is invalid. It must be in ['pk', 'fk', 'idx', 'col']",
+            "unknown is invalid. It must be in "
+            "['pk', 'fk', 'idx', 'col', 'cons', 'enum']",
         ) == err.value.args
 
     @pytest.mark.parametrize('clause', [
-            'too.few',
-            'too.many.definitely.for-sure',
+        'too.few',
+        'too.many.definitely.for-sure',
     ])
     def test_incorrect_clause(self, clause):
         ignore_data = [clause]
@@ -229,8 +230,8 @@ class TestIgnoreManager:
         ) == err.value.args
 
     @pytest.mark.parametrize('clause', [
-            '.pk.b',
-            'a.pk.',
+        '.pk.b',
+        'a.pk.',
     ])
     def test_incorrect_empty_clause(self, clause):
         ignore_data = [clause]

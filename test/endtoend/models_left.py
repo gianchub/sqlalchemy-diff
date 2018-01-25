@@ -1,9 +1,18 @@
 # -*- coding: utf-8 -*-
+import enum
+
 from sqlalchemy import Column, ForeignKey, Integer, String, Unicode
 from sqlalchemy.ext.declarative import declarative_base
 
+from .enumadaptor import Enum
+
 
 Base = declarative_base()
+
+
+class Polarity(enum.Enum):
+    NEGATIVE = 'NEGATIVE'
+    POSITIVE = 'POSITIVE'
 
 
 class Employee(Base):
@@ -14,6 +23,8 @@ class Employee(Base):
     age = Column(Integer, nullable=False, default=21)
     ssn = Column(Unicode(30), nullable=False)
     number_of_pets = Column(Integer, default=1, nullable=False)
+    polarity = Column(Enum(Polarity, native_enum=True))
+    spin = Column(Enum('spin_down', 'spin_up', native_enum=False))
 
     company_id = Column(
         Integer,

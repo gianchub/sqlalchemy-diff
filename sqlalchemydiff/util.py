@@ -108,7 +108,7 @@ def prepare_schema_from_models(uri, sqlalchemy_base):
 
 class IgnoreManager:
 
-    allowed_identifiers = ['pk', 'fk', 'idx', 'col']
+    allowed_identifiers = ['pk', 'fk', 'idx', 'col', 'cons', 'enum']
 
     def __init__(self, ignores, separator=None):
         self.separator = separator or '.'
