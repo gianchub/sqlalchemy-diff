@@ -13,12 +13,12 @@ with open(os.path.join(here, 'README.rst'), 'r', 'utf-8') as stream:
 
 setup(
     name='sqlalchemy-diff',
-    version='0.1.3',
+    version='0.1.4',
     description='Compare two database schemas using sqlalchemy.',
     long_description=readme,
     author='student.com',
     author_email='wearehiring@student.com',
-    url='https://github.com/Overseas-Student-Living/sqlalchemy-diff',
+    url='https://github.com/gianchub/sqlalchemy-diff',
     packages=find_packages(exclude=['docs', 'test', 'test.*']),
     install_requires=[
         "six>=1.10.0",
