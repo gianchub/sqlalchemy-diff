@@ -33,7 +33,7 @@ matrix:
           secure: "nS/snIn4e/AWu3yrpzDLPXB+wHXXVU0qLdf07ldUxBx3lJ5K4ggqM1o6huP+ny2lZM6Q+jlRaYj0L6Tb/pppC7Pimx+dni9EFHXvLVO5sLD80+qV/AQPf7tbdWY6FWBV8kMGpXPwdnbKRGnQ17nerBJUfvL0dxigGoAqpOgwxppw/qNk0J3ay2AUnKUnWUKUXgATBLH72MSW6/iT84asIV6jOlfmRLpFKiO42emyBmYTo/TwM6lkjLG465gI2oWc/2sVTR6rkq00Yz5AC3Ry/pUZYfg55M3hTgHSQ54qtd/7IlbsP9inYTiZGsYkDaHlKsM1DdXreApVIo7LzRfCblMGrGvQfZm3BVMmmOWGSzM9dqBOXxjVcG9xHoG4/jzxGJ40gXX4cRS0AgkAWak2Q34QKj30FIBeLrZNzpDUmyPrKFBkfLi8CR8pW06m0Kxs3XWoUvP7ajVocbGnQHXQpz4q7FoKmnXhg0u9XyJTdtZAMt/h7aN9Bb2N0Zfasex025dB93Z2qLmwMVYkwQhIxjfw4vCstq9t+q67JKDMP4O6T7ektJ1Qt2TNR2BEr0/V/r5uplH5qyNH8PKL5YV9afyI+f1Dbdk+8wsRBGFJOm+rHg/JLtkzpTjNeAy4VYsYb8R+1rRe9IyBR7ti0mpW22lemhAHUUdaaol7mZm5yTI="
         on:
           tags: true
-          repo: Overseas-Student-Living/sqlalchemy-diff
+          repo: gianchub/sqlalchemy-diff
         distributions: "sdist bdist_wheel"
 
 script:
