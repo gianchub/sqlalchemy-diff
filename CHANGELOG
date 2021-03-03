@@ -1,3 +1,11 @@
+Version 0.1.5
+-------------
+
+* Support for comparing Enum types (#11, thanks @charness)
+* Support for comparing Primary Key constraint names (#12, thanks @erikced)
+
+(Sorry it took three years :-/)
+
 Version 0.1.4
 -------------
 
