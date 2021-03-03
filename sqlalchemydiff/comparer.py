@@ -265,7 +265,10 @@ def _diff_dicts(left, right):
             })
 
     return DiffResult(
-        left_only=left_only, right_only=right_only, common=common, diff=diff
+        left_only=left_only,
+        right_only=right_only,
+        common=common,
+        diff=diff
     )._asdict()
 
 
@@ -279,8 +282,26 @@ def _get_foreign_keys_info(
     right_fk_list = _discard_ignores_by_name(right_fk_list, ignores)
 
     # process into dict
-    left_fk = dict((elem['name'], elem) for elem in left_fk_list)
-    right_fk = dict((elem['name'], elem) for elem in right_fk_list)
+
+    def fk_k(elem):
+        """Figure out a [join] key for the foreign key.
+
+        In order to correctly join multiple FK constraints within one table
+        across schema revisions we have to find a way to choose either between a
+        user/schema defined name or an implicit constraint.
+
+        """
+
+        return (
+            elem.get("name")
+            or (
+                "{table_name}_to_{referred_table}.{referred_columns}[0]"
+                .format(table_name=table_name, **elem)
+            )
+        )
+
+    left_fk = dict((fk_k(elem), elem) for elem in left_fk_list)
+    right_fk = dict((fk_k(elem), elem) for elem in right_fk_list)
 
     return _diff_dicts(left_fk, right_fk)
 
