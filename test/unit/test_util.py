@@ -6,7 +6,7 @@ import uuid
 import pytest
 
 from sqlalchemydiff.util import CompareResult, InspectorFactory, IgnoreManager
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 
 
 class TestCompareResult(object):
