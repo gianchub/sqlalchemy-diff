@@ -6,7 +6,7 @@ import uuid
 import pytest
 
 from sqlalchemydiff.util import CompareResult, InspectorFactory, IgnoreManager
-from mock import Mock, patch
+from unittest.mock import Mock, patch
 
 
 class TestCompareResult(object):
@@ -35,7 +35,7 @@ class TestCompareResult(object):
 
         result.dump_info(filename=filename)
 
-        with open(filename, 'rU') as stream:
+        with open(filename, 'r') as stream:
             assert info == json.loads(stream.read())
 
         os.unlink(filename)
@@ -47,7 +47,7 @@ class TestCompareResult(object):
 
         result.dump_errors(filename=filename)
 
-        with open(filename, 'rU') as stream:
+        with open(filename, 'r') as stream:
             assert errors == json.loads(stream.read())
 
         os.unlink(filename)
@@ -62,12 +62,12 @@ class TestCompareResult(object):
 
 class TestInspectorFactory(object):
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def create_engine_mock(self):
         with patch('sqlalchemydiff.util.create_engine') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def inspect_mock(self):
         with patch('sqlalchemydiff.util.inspect') as m:
             yield m

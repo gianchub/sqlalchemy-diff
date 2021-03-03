@@ -27,14 +27,14 @@ def uri_right(db_uri):
     return get_temporary_uri(db_uri)
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def new_db_left(uri_left):
     new_db(uri_left)
     yield
     destroy_database(uri_left)
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def new_db_right(uri_right):
     new_db(uri_right)
     yield
