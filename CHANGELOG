@@ -1,6 +1,7 @@
 Version 0.1.5
 -------------
 
+* Drop support for deprecated Python versions
 * Support for comparing Enum types (#11, thanks @charness)
 * Support for comparing Primary Key constraint names (#12, thanks @erikced)
 
