@@ -35,7 +35,7 @@ class TestCompareResult(object):
 
         result.dump_info(filename=filename)
 
-        with open(filename, 'rU') as stream:
+        with open(filename, 'r') as stream:
             assert info == json.loads(stream.read())
 
         os.unlink(filename)
@@ -47,7 +47,7 @@ class TestCompareResult(object):
 
         result.dump_errors(filename=filename)
 
-        with open(filename, 'rU') as stream:
+        with open(filename, 'r') as stream:
             assert errors == json.loads(stream.read())
 
         os.unlink(filename)
