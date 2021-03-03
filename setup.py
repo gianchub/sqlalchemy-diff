@@ -21,17 +21,15 @@ setup(
     url='https://github.com/gianchub/sqlalchemy-diff',
     packages=find_packages(exclude=['docs', 'test', 'test.*']),
     install_requires=[
-        "six>=1.10.0",
         "sqlalchemy-utils>=0.32.4",
     ],
     extras_require={
         'dev': [
-            "mock==2.0.0",
             "mysql-connector-python-rf==2.2.2",
-            "pytest==3.0.3",
-            "pylint==1.5.1",
-            "flake8==3.0.4",
-            "coverage==4.2",
+            "pytest==6.2.2",
+            "pylint==2.7.2",
+            "flake8==3.8.4",
+            "coverage==5.5",
         ],
         'docs': [
             "sphinx==1.4.1",
