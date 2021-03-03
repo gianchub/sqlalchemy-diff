@@ -62,12 +62,12 @@ class TestCompareResult(object):
 
 class TestInspectorFactory(object):
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def create_engine_mock(self):
         with patch('sqlalchemydiff.util.create_engine') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def inspect_mock(self):
         with patch('sqlalchemydiff.util.inspect') as m:
             yield m

@@ -35,7 +35,7 @@ from sqlalchemydiff.comparer import (
 from test import assert_items_equal
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def mock_inspector_factory():
     with patch.object(InspectorFactory, 'from_uri') as from_uri:
         from_uri.side_effect = [
@@ -50,7 +50,7 @@ class TestCompareCallsChain(object):
     """This test class makes sure the `compare` function inside process
     works as expected.
     """
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_inspectors_mock(self):
         with patch('sqlalchemydiff.comparer._get_inspectors') as m:
             m.return_value = [
@@ -59,12 +59,12 @@ class TestCompareCallsChain(object):
             ]
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_tables_data_mock(self):
         with patch('sqlalchemydiff.comparer._get_tables_data') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _compile_errors_mock(self):
         with patch('sqlalchemydiff.comparer._compile_errors') as m:
 
@@ -81,7 +81,7 @@ class TestCompareCallsChain(object):
             m.side_effect = info_side_effect
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_tables_info_mock(self):
         with patch('sqlalchemydiff.comparer._get_tables_info') as m:
             m.return_value = TablesInfo(
@@ -93,7 +93,7 @@ class TestCompareCallsChain(object):
             )
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_enums_data_mock(self):
         with patch('sqlalchemydiff.comparer._get_enums_data') as m:
             m.return_value = []
@@ -172,67 +172,67 @@ class TestCompareInternals(object):
 
     # FIXTURES
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_table_data_mock(self):
         with patch('sqlalchemydiff.comparer._get_table_data') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _diff_dicts_mock(self):
         with patch('sqlalchemydiff.comparer._diff_dicts') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_foreign_keys_mock(self):
         with patch('sqlalchemydiff.comparer._get_foreign_keys') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_primary_keys_mock(self):
         with patch('sqlalchemydiff.comparer._get_primary_keys') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_indexes_mock(self):
         with patch('sqlalchemydiff.comparer._get_indexes') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_columns_mock(self):
         with patch('sqlalchemydiff.comparer._get_columns') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _process_types_mock(self):
         with patch('sqlalchemydiff.comparer._process_types') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _process_type_mock(self):
         with patch('sqlalchemydiff.comparer._process_type') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_foreign_keys_info_mock(self):
         with patch('sqlalchemydiff.comparer._get_foreign_keys_info') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_primary_keys_info_mock(self):
         with patch('sqlalchemydiff.comparer._get_primary_keys_info') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_indexes_info_mock(self):
         with patch('sqlalchemydiff.comparer._get_indexes_info') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_columns_info_mock(self):
         with patch('sqlalchemydiff.comparer._get_columns_info') as m:
             yield m
 
-    @pytest.yield_fixture
+    @pytest.fixture
     def _get_constraints_info_mock(self):
         with patch('sqlalchemydiff.comparer._get_constraints_info') as m:
             yield m
