@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.14"]
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        version: "latest"
+
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
+
+    - name: Create virtual environment
+      run: uv venv --python ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: uv pip install -e ".[dev,lint,test]"
+
+    - name: Run linting
+      run: uv run make lint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.14"]
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        version: "latest"
+
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
+
+    - name: Create virtual environment
+      run: uv venv --python ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: uv pip install -e ".[dev,lint,test]"
+
+    - name: Run type checking
+      run: uv run make ty
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13", "3.14"]
+        tests-command: ["test", "test-sqlalchemy14"]
+
+    services:
+      postgres:
+        image: postgres:17.4
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5433:5432
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: "latest"
+
+    - name: Set up Python ${{ matrix.python-version }}
+      run: uv python install ${{ matrix.python-version }}
+
+    - name: Create virtual environment
+      run: uv venv --python ${{ matrix.python-version }}
+
+    - name: Install dependencies
+      run: uv pip install -e ".[dev,lint,test]"
+
+    - name: Run tests
+      run: make ${{ matrix.tests-command }}
+      env:
+        DB_TEST_USER: postgres
+        DB_TEST_PASSWORD: postgres
+        DB_TEST_HOST: localhost
+        DB_TEST_PORT: 5433

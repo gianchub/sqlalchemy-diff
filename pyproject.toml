@@ -1,0 +1,145 @@
+[project]
+name = "sqlalchemy-diff"
+version = "1.0.0"
+authors = [
+    { name = "Fabrizio Romano", email = "gianchub@gmail.com" },
+    { name = "Mark McArdle", email = "m.mc4rdle@gmail.com" },
+]
+description = "A tool for comparing SQLAlchemy models"
+readme = "README.md"
+license-files = ["LICEN[CS]E*"]
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "License :: OSI Approved :: Apache Software License",
+
+    # Indicate who your project is intended for
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries",
+    "Topic :: Database",
+    "Operating System :: OS Independent",
+]
+maintainers = [
+    { name = "Fabrizio Romano", email = "gianchub@gmail.com" },
+    { name = "Mark McArdle", email = "m.mc4rdle@gmail.com" },
+]
+keywords = ["sqlalchemy", "diff", "compare"]
+dependencies = [
+    "sqlalchemy~=2.0",
+    "sqlalchemy-utils~=0.41.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "jupyterlab",
+    "pdbpp",
+    "rich",
+]
+lint = [
+    "ruff~=0.14.1",
+    "ty",
+]
+test = [
+    "pytest~=8.4.2",
+    "pytest-cov~=7.0.0",
+    "psycopg2-binary",
+    "pytest-xdist>=3.8.0",
+]
+all = ["sqlalchemy-diff[dev,lint,test]"]
+
+
+[project.urls]
+Homepage = "https://github.com/gianchub/sqlalchemy-diff"
+Issues = "https://github.com/gianchub/sqlalchemy-diff/issues"
+License = "https://github.com/gianchub/sqlalchemy-diff/blob/main/LICENSE"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm.build]
+includes = ["src/"]
+excludes = ["tests/", "**/__pycache__/", "*.pyc"]
+
+[[tool.uv.index]]
+name = "testpypi"
+url = "https://test.pypi.org/simple/"
+publish-url = "https://test.pypi.org/legacy/"
+explicit = true
+
+[tool.pdm.version]
+source = "file"
+path = "src/sqlalchemydiff/__init__.py"
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4", # flake8-comprehensions
+    "UP", # pyupgrade
+]
+ignore = [
+    "E203",  # whitespace before ':' (conflicts with black)
+    "E701",  # multiple statements on one line (colon)
+]
+
+[tool.ruff.lint.isort]
+lines-after-imports = 2
+known-first-party = ["sqlalchemydiff", "tests"]
+section-order = ["future", "standard-library", "third-party", "first-party", "local-folder"]
+
+[tool.ty.src]
+include = ["src", "tests"]
+exclude = ["tests/models/models_one.py", "tests/models/models_two.py"]
+
+[tool.coverage.run]
+branch = true
+source = ["src"]
+
+[tool.coverage.report]
+fail_under = 100
+show_missing = true
+
+[tool.pytest.ini_options]
+addopts = [
+    "--strict-markers",
+    "--no-cov-on-fail",
+    "--cov=sqlalchemydiff",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=100",
+]
+faulthandler_timeout = 10
+
+markers = [
+    "is_sqlalchemy_1_4: mark test as SQLAlchemy 1.4",
+]
