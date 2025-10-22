@@ -1,6 +1,6 @@
 [project]
 name = "sqlalchemy-diff"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
     { name = "Fabrizio Romano", email = "gianchub@gmail.com" },
     { name = "Mark McArdle", email = "m.mc4rdle@gmail.com" },
@@ -31,7 +31,7 @@ maintainers = [
 ]
 keywords = ["sqlalchemy", "diff", "compare"]
 dependencies = [
-    "sqlalchemy~=2.0",
+    "sqlalchemy>=1.4,<3",
     "sqlalchemy-utils~=0.41.2",
 ]
 
