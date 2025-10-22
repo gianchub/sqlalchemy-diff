@@ -2198,7 +2198,7 @@ wheels = [
 
 [[package]]
 name = "sqlalchemy-diff"
-version = "1.0.14"
+version = "1.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "sqlalchemy" },
@@ -2243,7 +2243,7 @@ requires-dist = [
     { name = "pytest-xdist", marker = "extra == 'test'", specifier = ">=3.8.0" },
     { name = "rich", marker = "extra == 'dev'" },
     { name = "ruff", marker = "extra == 'lint'", specifier = "~=0.14.1" },
-    { name = "sqlalchemy", specifier = "~=2.0" },
+    { name = "sqlalchemy", specifier = ">=1.4,<3" },
     { name = "sqlalchemy-diff", extras = ["dev", "lint", "test"], marker = "extra == 'all'" },
     { name = "sqlalchemy-utils", specifier = "~=0.41.2" },
     { name = "ty", marker = "extra == 'lint'" },
