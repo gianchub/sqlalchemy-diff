@@ -38,9 +38,9 @@ description = "Run unit tests with Python {basepython} and sqlalchemy V1.4"
 skip_install = true
 deps = [
     "sqlalchemy~=1.4",
-    "sqlalchemy-utils~=0.41.2",
-    "pytest~=8.3",
-    "pytest-cov~=6.0",
+    "sqlalchemy-utils>=0.40.0,!=0.42.0",
+    "pytest~=8.4.2",
+    "pytest-cov~=7.0.0",
     "psycopg2-binary",
 ]
 allowlist_externals = ["make"]

@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.14"]
-    
+
     steps:
     - uses: actions/checkout@v4
 
@@ -38,7 +38,7 @@ jobs:
     strategy:
       matrix:
         python-version: ["3.9", "3.14"]
-    
+
     steps:
     - uses: actions/checkout@v4
 
@@ -57,7 +57,7 @@ jobs:
       run: uv pip install -e ".[dev,lint,test]"
 
     - name: Run type checking
-      run: uv run make ty
+      run: make ty
 
   test:
     runs-on: ubuntu-latest

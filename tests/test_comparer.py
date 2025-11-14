@@ -152,7 +152,6 @@ class TestComparerV14(BaseTest):
     def test_compare(self, db_engine_one, db_engine_two, compare_result_v14, compare_errors_v14):
         comparer = Comparer(db_engine_one, db_engine_two)
         result = comparer.compare()
-        print(result.errors)
         assert result.result == compare_result_v14
         assert result.errors == compare_errors_v14
 
