@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, cast
 
 from sqlalchemy.engine import Engine
 
@@ -209,7 +209,7 @@ class UniqueConstraintsInspector(BaseInspector, DiffMixin):
             if not name:
                 name = f"unique_{table_name}_{'_'.join(constraint.get('column_names'))}"
             constraint["name"] = name
-        return result
+        return cast(list[dict], result)
 
     def _is_supported(self, inspector: Inspector) -> bool:
         return hasattr(inspector, "get_unique_constraints")
@@ -255,7 +255,7 @@ class EnumsInspector(BaseInspector, DiffMixin):
         inspector = self._get_inspector(engine)
 
         ignore_clauses = self._filter_ignorers(ignore_specs)
-        enums = inspector.get_enums() or []
+        enums = getattr(inspector, "get_enums", lambda: [])() or []
         return [enum for enum in enums if enum["name"] not in ignore_clauses.enums]
 
     def diff(self, one: dict, two: dict) -> dict:

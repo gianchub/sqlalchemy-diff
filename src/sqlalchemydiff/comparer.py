@@ -133,12 +133,14 @@ class Comparer:
                 db_one_info = self._get_db_info(ignore_specs, inspector, self.db_one_engine)
                 db_two_info = self._get_db_info(ignore_specs, inspector, self.db_two_engine)
 
-                if None not in [db_one_info, db_two_info]:
+                if db_one_info is not None and db_two_info is not None:
                     result[key] = inspector.diff(db_one_info, db_two_info)
 
         return self.compare_result_class(result, one_alias=one_alias, two_alias=two_alias)
 
-    def _filter_inspectors(self, ignore_inspectors: Optional[set[str]]) -> list[str]:
+    def _filter_inspectors(
+        self, ignore_inspectors: Optional[set[str]]
+    ) -> list[tuple[str, type[BaseInspector]]]:
         if not ignore_inspectors:
             ignore_inspectors = set()
 
