@@ -1,7 +1,6 @@
 # ty: ignore[invalid-assignment]
 import datetime
 import enum
-from typing import Optional
 
 from sqlalchemy import (
     CheckConstraint,
@@ -36,8 +35,8 @@ class Employee(Base):
     age: Mapped[int] = Column(Integer, nullable=False, default=21)
     ssn: Mapped[str] = Column(Unicode(30), nullable=False)
     number_of_pets: Mapped[int] = Column(Integer, default=1, nullable=False)
-    title: Mapped[Optional[Title]] = Column(Enum(Title, native_enum=True))
-    department: Mapped[Optional[str]] = Column(  # ty: ignore[invalid-assignment]
+    title: Mapped[Title | None] = Column(Enum(Title, native_enum=True))
+    department: Mapped[str | None] = Column(  # ty: ignore[invalid-assignment]
         Enum("Product", "Engineering", "Sales", native_enum=False)
     )
 
@@ -77,7 +76,7 @@ class Role(Base):
 
     employees: Mapped[list["Employee"]] = relationship("Employee", back_populates="role")
 
-    role_type: Mapped[Optional[str]] = Column(Enum("Permanent", "Contractor", name="role_type"))
+    role_type: Mapped[str | None] = Column(Enum("Permanent", "Contractor", name="role_type"))
 
 
 class Skill(Base):
@@ -87,7 +86,7 @@ class Skill(Base):
     }
 
     slug: Mapped[str] = Column(String(50), primary_key=True)
-    description: Mapped[Optional[str]] = Column(Unicode(100), nullable=True)
+    description: Mapped[str | None] = Column(Unicode(100), nullable=True)
 
     employee: Mapped[int] = Column(
         Integer, ForeignKey("employees.id", name="fk_skills_employees"), nullable=False

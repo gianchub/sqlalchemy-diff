@@ -1,18 +1,18 @@
 from dataclasses import dataclass, field
-from typing import NamedTuple, Optional, Union
+from typing import NamedTuple
 
 
 class TableIgnoreSpec(NamedTuple):
     table_name: str
-    inspector_key: Optional[str] = None
-    object_name: Optional[str] = None
+    inspector_key: str | None = None
+    object_name: str | None = None
 
 
 class EnumIgnoreSpec(NamedTuple):
     name: str
 
 
-IgnoreSpecType = Union[TableIgnoreSpec, EnumIgnoreSpec]
+IgnoreSpecType = TableIgnoreSpec | EnumIgnoreSpec
 
 
 class IgnoreSpecFactory:
@@ -29,9 +29,7 @@ class IgnoreSpecFactory:
     separator = "."
 
     @classmethod
-    def create_specs(
-        cls, register: dict, ignores: Optional[list[str]] = None
-    ) -> list[IgnoreSpecType]:
+    def create_specs(cls, register: dict, ignores: list[str] | None = None) -> list[IgnoreSpecType]:
         if not ignores:
             return []
 
@@ -64,6 +62,6 @@ class IgnoreClauses:
     enums: list[str] = field(default_factory=list)
     clauses: list[IgnoreSpecType] = field(default_factory=list)
 
-    def is_clause(self, table_name: str, inspector_key: str, object_name: Optional[str]) -> bool:
+    def is_clause(self, table_name: str, inspector_key: str, object_name: str | None) -> bool:
         clause = TableIgnoreSpec(table_name, inspector_key, object_name)
         return clause in self.clauses

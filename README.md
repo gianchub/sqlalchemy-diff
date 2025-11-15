@@ -1,10 +1,10 @@
 # SQLAlchemy Diff
 
-A tool for comparing SQLAlchemy models.
+A tool for comparing database schemas using SQLAlchemy.
 
 ## Requirements
 
-- Python 3.9 or higher (supports 3.9, 3.10, 3.11, 3.12, 3.13, 3.14)
+- Python 3.10 or higher (supports 3.10, 3.11, 3.12, 3.13, 3.14)
 - SQLAlchemy >= 1.4
 - sqlalchemy-utils ~= 0.41.2
 
@@ -100,7 +100,7 @@ class MyCustomInspector(BaseInspector, DiffMixin):
     # Set to False if it operates at table level (like columns, indexes)
     db_level = False
 
-    def inspect(self, engine: Engine, ignore_specs: Optional[list] = None) -> dict:
+    def inspect(self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None) -> dict:
         """
         Inspect the database and return structured data.
 
@@ -161,7 +161,7 @@ class SequencesInspector(BaseInspector, DiffMixin):
     key = "sequences"
     db_level = True
 
-    def inspect(self, engine: Engine, ignore_specs: Optional[list] = None) -> dict:
+    def inspect(self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None) -> dict:
         ignore_clauses = self._filter_ignorers(ignore_specs)
         inspector = self._get_inspector(engine)
 

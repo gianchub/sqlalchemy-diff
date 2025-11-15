@@ -2,7 +2,7 @@ import json
 import logging
 from collections.abc import Iterable
 from copy import deepcopy
-from typing import Any, Optional
+from typing import Any
 
 from sqlalchemy.engine import Engine
 
@@ -104,8 +104,8 @@ class Comparer:
         cls,
         db_one_uri: str,
         db_two_uri: str,
-        db_one_params: Optional[dict[str, Any]] = None,
-        db_two_params: Optional[dict[str, Any]] = None,
+        db_one_params: dict[str, Any] | None = None,
+        db_two_params: dict[str, Any] | None = None,
     ):
         db_one_params = db_one_params or {}
         db_two_params = db_two_params or {}
@@ -118,8 +118,8 @@ class Comparer:
         self,
         one_alias: str = "one",
         two_alias: str = "two",
-        ignores: Optional[list[str]] = None,
-        ignore_inspectors: Optional[Iterable[str]] = None,
+        ignores: list[str] | None = None,
+        ignore_inspectors: Iterable[str] | None = None,
     ):
         ignore_specs = self.ignore_spec_factory_class().create_specs(register, ignores)
 
@@ -139,7 +139,7 @@ class Comparer:
         return self.compare_result_class(result, one_alias=one_alias, two_alias=two_alias)
 
     def _filter_inspectors(
-        self, ignore_inspectors: Optional[set[str]]
+        self, ignore_inspectors: set[str] | None
     ) -> list[tuple[str, type[BaseInspector]]]:
         if not ignore_inspectors:
             ignore_inspectors = set()
@@ -152,7 +152,7 @@ class Comparer:
 
     def _get_db_info(
         self, ignore_specs: list[IgnoreSpecType], inspector: BaseInspector, engine: Engine
-    ) -> Optional[dict]:
+    ) -> dict | None:
         try:
             return inspector.inspect(engine, ignore_specs)
         except InspectorNotSupported as e:

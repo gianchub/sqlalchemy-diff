@@ -1,6 +1,5 @@
 import datetime
 import enum
-from typing import Optional
 
 from sqlalchemy import (
     BigInteger,
@@ -48,8 +47,8 @@ class Employee(Base):
     )
     ssn: Mapped[str] = Column(Unicode(30), nullable=False, index=True)
     number_of_pets: Mapped[int] = Column(BigInteger, default=100, nullable=True)
-    title: Mapped[Optional[Title]] = Column(Enum(Title, native_enum=True))
-    department: Mapped[Optional[str]] = Column(
+    title: Mapped[Title | None] = Column(Enum(Title, native_enum=True))
+    department: Mapped[str | None] = Column(
         Enum("Product", "Engineering", "Sales", native_enum=False)
     )
 
@@ -79,7 +78,7 @@ class Company(Base):
 
     employees: Mapped[list["Employee"]] = relationship("Employee", back_populates="company")
 
-    company_type: Mapped[Optional[str]] = Column(
+    company_type: Mapped[str | None] = Column(
         Enum("Public", "Private", "Sole Trader", name="company_type")
     )
 
@@ -93,7 +92,7 @@ class Role(Base):
 
     employees: Mapped[list["Employee"]] = relationship("Employee", back_populates="role")
 
-    role_type: Mapped[Optional[str]] = Column(Enum("Permanent", "Contractor", name="role_type"))
+    role_type: Mapped[str | None] = Column(Enum("Permanent", "Contractor", name="role_type"))
 
 
 class Skill(Base):
@@ -103,7 +102,7 @@ class Skill(Base):
     }
 
     slug: Mapped[str] = Column(String(50), primary_key=True)
-    description: Mapped[Optional[str]] = Column(
+    description: Mapped[str | None] = Column(
         Unicode(100), nullable=False, default="Skill description", unique=True
     )
 

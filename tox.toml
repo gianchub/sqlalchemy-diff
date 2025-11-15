@@ -5,13 +5,11 @@ env_list = [
     "py312",
     "py311",
     "py310",
-    "py39",
     "py314-sqlalchemy14",
     "py313-sqlalchemy14",
     "py312-sqlalchemy14",
     "py311-sqlalchemy14",
     "py310-sqlalchemy14",
-    "py39-sqlalchemy14",
 ]
 
 [env_run_base]
@@ -39,7 +37,7 @@ skip_install = true
 deps = [
     "sqlalchemy~=1.4",
     "sqlalchemy-utils>=0.40.0,!=0.42.0",
-    "pytest~=8.4.2",
+    "pytest~=9.0.1",
     "pytest-cov~=7.0.0",
     "psycopg2-binary",
 ]
@@ -49,10 +47,6 @@ passenv = ["DB_TEST_USER", "DB_TEST_PASSWORD", "DB_TEST_PORT", "DB_TEST_HOST"]
 commands = [
     ["make", "test-sqlalchemy14", "ARGS={posargs:-vv --no-cov}"],
 ]
-
-[env.py39-sqlalchemy14]
-description = "Run unit tests with Python 3.9 and sqlalchemy V1.4"
-base = ["env.sqlalchemy14"]
 
 [env.py310-sqlalchemy14]
 description = "Run unit tests with Python 3.10 and sqlalchemy V1.4"
