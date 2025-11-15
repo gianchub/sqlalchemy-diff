@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import NamedTuple, Optional, Union
 
 
@@ -60,9 +60,10 @@ class IgnoreSpecFactory:
 
 @dataclass
 class IgnoreClauses:
-    tables: Optional[list[str]] = None
-    enums: Optional[list[str]] = None
-    clauses: Optional[list[IgnoreSpecType]] = None
+    tables: list[str] = field(default_factory=list)
+    enums: list[str] = field(default_factory=list)
+    clauses: list[IgnoreSpecType] = field(default_factory=list)
 
-    def is_clause(self, table_name: str, inspector_key: str, object_name: str) -> bool:
-        return (table_name, inspector_key, object_name) in self.clauses
+    def is_clause(self, table_name: str, inspector_key: str, object_name: Optional[str]) -> bool:
+        clause = TableIgnoreSpec(table_name, inspector_key, object_name)
+        return clause in self.clauses

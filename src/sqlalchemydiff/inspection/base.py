@@ -68,7 +68,7 @@ class BaseInspector(abc.ABC, metaclass=BaseInspectorMeta):
     @abc.abstractmethod
     def _is_supported(self, inspector: Inspector) -> bool: ...  # pragma: no cover
 
-    def _filter_ignorers(self, specs: list[IgnoreSpecType]) -> IgnoreClauses:
+    def _filter_ignorers(self, specs: Optional[list[IgnoreSpecType]]) -> IgnoreClauses:
         tables, enums, clauses = [], [], []
 
         for spec in specs or []:

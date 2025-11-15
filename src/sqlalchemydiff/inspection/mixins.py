@@ -7,6 +7,11 @@ class DiffMixin:
     Provides methods used by the inspectors to diff the results.
     """
 
+    one_alias: str
+    two_alias: str
+    one_only_alias: str
+    two_only_alias: str
+
     def _get_empty_result(self) -> dict:
         return {
             self.one_only_alias: [],
@@ -79,7 +84,7 @@ class DiffMixin:
 
         return result
 
-    def _itemsdiff(self, items_in_one: Iterable[Mapping], items_in_two: Iterable[Mapping]) -> list:
+    def _itemsdiff(self, items_in_one: Iterable[Mapping], items_in_two: Iterable[Mapping]) -> dict:
         """Diff iterables of items in mapping format.
 
         `items_in_one` and `items_in_two` are iterables of items in mapping format.
