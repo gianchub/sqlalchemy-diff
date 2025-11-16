@@ -1,6 +1,5 @@
 import abc
 import inspect as stdlib_inspect
-from typing import Optional
 
 from sqlalchemy import inspect
 from sqlalchemy.engine import Engine
@@ -59,7 +58,7 @@ class BaseInspector(abc.ABC, metaclass=BaseInspectorMeta):
 
     @abc.abstractmethod
     def inspect(
-        self, engine: Engine, ignore_specs: Optional[list[IgnoreSpecType]] = None
+        self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None
     ) -> dict: ...  # pragma: no cover
 
     @abc.abstractmethod
@@ -68,7 +67,7 @@ class BaseInspector(abc.ABC, metaclass=BaseInspectorMeta):
     @abc.abstractmethod
     def _is_supported(self, inspector: Inspector) -> bool: ...  # pragma: no cover
 
-    def _filter_ignorers(self, specs: Optional[list[IgnoreSpecType]]) -> IgnoreClauses:
+    def _filter_ignorers(self, specs: list[IgnoreSpecType] | None) -> IgnoreClauses:
         tables, enums, clauses = [], [], []
 
         for spec in specs or []:

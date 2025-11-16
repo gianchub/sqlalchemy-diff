@@ -1,5 +1,3 @@
-from typing import Optional
-
 import pytest
 from sqlalchemy.engine import Engine
 
@@ -23,7 +21,7 @@ class TestReadmeExamples(BaseTest):
             key = "sequences"
             db_level = True
 
-            def inspect(self, engine: Engine, ignore_specs: Optional[list] = None) -> dict:
+            def inspect(self, engine: Engine, ignore_specs: list | None = None) -> dict:
                 ignore_clauses = self._filter_ignorers(ignore_specs)
                 inspector = self._get_inspector(engine)
 

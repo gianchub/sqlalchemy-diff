@@ -42,7 +42,7 @@ ty:
 # requirements
 
 install-reqs:
-	uv pip install -e ."[dev,lint,test]"
+	uv pip install -U -e ."[dev,lint,test]"
 
 install-tox-uv:
 	uv tool install tox --with tox-uv

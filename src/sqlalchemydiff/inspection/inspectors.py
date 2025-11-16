@@ -1,4 +1,4 @@
-from typing import Optional, cast
+from typing import cast
 
 from sqlalchemy.engine import Engine
 
@@ -14,11 +14,11 @@ class TablesInspector(BaseInspector, DiffMixin):
     key = "tables"
     db_level = True
 
-    def inspect(self, engine: Engine, ignore_specs: Optional[list[IgnoreSpecType]] = None) -> dict:
+    def inspect(self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None) -> dict:
         ignore_clauses = self._filter_ignorers(ignore_specs)
         inspector = self._get_inspector(engine)
 
-        def get_comment(table_name: str) -> Optional[str]:
+        def get_comment(table_name: str) -> str | None:
             try:
                 return inspector.get_table_comment(table_name)["text"]
             except NotImplementedError:
@@ -30,7 +30,7 @@ class TablesInspector(BaseInspector, DiffMixin):
             if table_name not in ignore_clauses.tables
         }
 
-    def _format_table(self, table_name: str, comment: Optional[str] = None) -> dict:
+    def _format_table(self, table_name: str, comment: str | None = None) -> dict:
         return {
             "name": table_name,
             "comment": comment or "",
@@ -48,7 +48,7 @@ class ColumnsInspector(BaseInspector, DiffMixin):
 
     key = "columns"
 
-    def inspect(self, engine: Engine, ignore_specs: Optional[list[IgnoreSpecType]] = None) -> dict:
+    def inspect(self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None) -> dict:
         ignore_clauses = self._filter_ignorers(ignore_specs)
 
         inspector = self._get_inspector(engine)
@@ -90,7 +90,7 @@ class PrimaryKeysInspector(BaseInspector, DiffMixin):
 
     key = "primary_keys"
 
-    def inspect(self, engine: Engine, ignore_specs: Optional[list[IgnoreSpecType]] = None) -> dict:
+    def inspect(self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None) -> dict:
         ignore_clauses = self._filter_ignorers(ignore_specs)
 
         inspector = self._get_inspector(engine)
@@ -121,7 +121,7 @@ class ForeignKeysInspector(BaseInspector, DiffMixin):
 
     key = "foreign_keys"
 
-    def inspect(self, engine: Engine, ignore_specs: Optional[list[IgnoreSpecType]] = None) -> dict:
+    def inspect(self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None) -> dict:
         ignore_clauses = self._filter_ignorers(ignore_specs)
 
         inspector = self._get_inspector(engine)
@@ -155,7 +155,7 @@ class IndexesInspector(BaseInspector, DiffMixin):
 
     key = "indexes"
 
-    def inspect(self, engine: Engine, ignore_specs: Optional[list[IgnoreSpecType]] = None) -> dict:
+    def inspect(self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None) -> dict:
         ignore_clauses = self._filter_ignorers(ignore_specs)
         inspector = self._get_inspector(engine)
         table_names = inspector.get_table_names()
@@ -183,7 +183,7 @@ class UniqueConstraintsInspector(BaseInspector, DiffMixin):
 
     key = "unique_constraints"
 
-    def inspect(self, engine: Engine, ignore_specs: Optional[list[IgnoreSpecType]] = None) -> dict:
+    def inspect(self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None) -> dict:
         ignore_clauses = self._filter_ignorers(ignore_specs)
         inspector = self._get_inspector(engine)
         table_names = inspector.get_table_names()
@@ -220,7 +220,7 @@ class CheckConstraintsInspector(BaseInspector, DiffMixin):
 
     key = "check_constraints"
 
-    def inspect(self, engine: Engine, ignore_specs: Optional[list[IgnoreSpecType]] = None) -> dict:
+    def inspect(self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None) -> dict:
         ignore_clauses = self._filter_ignorers(ignore_specs)
         inspector = self._get_inspector(engine)
         table_names = inspector.get_table_names()
@@ -250,7 +250,7 @@ class EnumsInspector(BaseInspector, DiffMixin):
     db_level = True
 
     def inspect(
-        self, engine: Engine, ignore_specs: Optional[list[IgnoreSpecType]] = None
+        self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None
     ) -> list[dict]:
         inspector = self._get_inspector(engine)
 
