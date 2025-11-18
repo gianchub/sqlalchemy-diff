@@ -57,10 +57,7 @@ class CompareResult:
     @property
     def is_match(self):
         """Tell if comparison was a match."""
-        for errors in self.errors.values():
-            if errors:
-                return False
-        return True
+        return not any(self.errors.values())
 
     def dump_result(self, filename):
         """Dump `result` dict to a file."""
