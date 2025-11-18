@@ -1,6 +1,6 @@
 [project]
 name = "sqlalchemy-diff"
-version = "1.0.3"
+version = "1.0.4"
 authors = [
     { name = "Fabrizio Romano", email = "gianchub@gmail.com" },
     { name = "Mark McArdle", email = "m.mc4rdle@gmail.com" },

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.4]
+
+18/11/2025
+
+- Fix `CompareResult.is_match` property.
+- Fix typo in `dictdiff` method.
+- Remove redundant return statement.
+
 ## [1.0.3]
 
 15/11/2025
