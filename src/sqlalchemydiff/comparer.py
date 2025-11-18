@@ -57,7 +57,10 @@ class CompareResult:
     @property
     def is_match(self):
         """Tell if comparison was a match."""
-        return not self.errors
+        for errors in self.errors.values():
+            if errors:
+                return False
+        return True
 
     def dump_result(self, filename):
         """Dump `result` dict to a file."""
@@ -157,4 +160,3 @@ class Comparer:
             return inspector.inspect(engine, ignore_specs)
         except InspectorNotSupported as e:
             logger.warning({"engine": engine, "inspector": inspector.key, "error": e.message})
-            return None

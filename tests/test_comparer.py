@@ -37,6 +37,18 @@ class TestCompareResult(BaseTest):
         assert compare_result.errors == {}
         assert compare_result.is_match
 
+    @pytest.mark.usefixtures("setup_db_one", "setup_db_two")
+    def test_compare_not_match(self, db_engine_one, db_engine_two):
+        comparer = Comparer(db_engine_one, db_engine_two)
+        result = comparer.compare()
+        assert not result.is_match
+
+    @pytest.mark.usefixtures("setup_db_one")
+    def test_compare_is_match(self, db_engine_one):
+        comparer = Comparer(db_engine_one, db_engine_one)
+        result = comparer.compare()
+        assert result.is_match
+
 
 class TestComparer(BaseTest):
     @pytest.fixture
