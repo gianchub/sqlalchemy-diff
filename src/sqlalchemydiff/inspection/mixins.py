@@ -91,7 +91,7 @@ class DiffMixin:
         They will be different according to which inspector is being used, but their structure
         will always be consistent, like in the following example:
 
-        one = [
+        items_in_one = [
             {
                 "name": "id",
                 "type": "INTEGER",
