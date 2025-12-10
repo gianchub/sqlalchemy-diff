@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.0]
+
+10/12/2025
+
+- Remove dependency on sqlalchemy-utils.
+- Add our own database utility functions for test purposes.
+- Add comprehensive test suite for database utility functions.
+
+
 ## [1.0.4]
 
 18/11/2025

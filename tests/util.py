@@ -3,9 +3,9 @@ from collections.abc import Mapping
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm.decl_api import DeclarativeMeta
-from sqlalchemy_utils import create_database, database_exists, drop_database
 
 from tests import assert_items_equal
+from tests.db_util import create_database, database_exists, drop_database
 
 
 def create_db(uri):

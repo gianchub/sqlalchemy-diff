@@ -1,5 +1,6 @@
 import abc
 import inspect as stdlib_inspect
+from typing import Any
 
 from sqlalchemy import inspect
 from sqlalchemy.engine import Engine
@@ -59,7 +60,7 @@ class BaseInspector(abc.ABC, metaclass=BaseInspectorMeta):
     @abc.abstractmethod
     def inspect(
         self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None
-    ) -> dict: ...  # pragma: no cover
+    ) -> Any: ...  # pragma: no cover
 
     @abc.abstractmethod
     def diff(self, one: dict, two: dict) -> dict: ...  # pragma: no cover
