@@ -1,5 +1,3 @@
-"""Comprehensive test suite for tests.db_util module."""
-
 import uuid
 from pathlib import Path
 
