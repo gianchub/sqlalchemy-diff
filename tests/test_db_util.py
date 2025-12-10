@@ -4,6 +4,7 @@ import uuid
 from pathlib import Path
 
 import pytest
+from sqlalchemy import create_engine
 from sqlalchemy.exc import ProgrammingError
 
 from tests.db_util import (
@@ -310,8 +311,6 @@ class TestDropDatabase:
             create_database(postgres_uri)
 
         # Create a connection to the database
-        from sqlalchemy import create_engine
-
         engine = create_engine(postgres_uri)
         conn = engine.connect()
 
