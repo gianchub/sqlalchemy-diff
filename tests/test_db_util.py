@@ -500,4 +500,3 @@ class TestDatabaseOperationsEdgeCases:
         assert database_exists(uri)
         create_database(uri)  # Should be no-op
         drop_database(uri)  # Should be no-op
-

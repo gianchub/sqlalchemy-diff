@@ -27,7 +27,7 @@ def _get_postgres_admin_uri(uri):
     """Get a PostgreSQL URI pointing to the 'postgres' database for admin operations."""
     parsed = _parse_database_uri(uri)
     # Connect to 'postgres' database instead of the target database
-    port_part = f":{parsed['port']}" if parsed['port'] is not None else ""
+    port_part = f":{parsed['port']}" if parsed["port"] is not None else ""
     admin_uri = (
         f"postgresql://{parsed['username']}:{parsed['password']}@"
         f"{parsed['hostname']}{port_part}/postgres"
@@ -75,10 +75,7 @@ def database_exists(uri):
         try:
             with engine.connect() as conn:
                 result = conn.execute(
-                    text(
-                        "SELECT 1 FROM pg_database WHERE datname = :dbname"
-                    ),
-                    {"dbname": target_db}
+                    text("SELECT 1 FROM pg_database WHERE datname = :dbname"), {"dbname": target_db}
                 )
                 return result.fetchone() is not None
         finally:
@@ -165,7 +162,7 @@ def drop_database(uri):
                         AND pid <> pg_backend_pid()
                         """
                     ),
-                    {"dbname": target_db}
+                    {"dbname": target_db},
                 )
                 # Drop the database
                 conn.execute(text(f'DROP DATABASE IF EXISTS "{target_db}"'))
@@ -185,4 +182,3 @@ def drop_database(uri):
 
     else:
         raise ValueError(f"Unsupported database scheme: {scheme}")
-
