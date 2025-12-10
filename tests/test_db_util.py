@@ -212,11 +212,11 @@ class TestCreateDatabase:
     def test_create_database_sqlite_memory(self):
         """Test creating in-memory SQLite database (no-op)."""
         uri = "sqlite:///:memory:"
+        # In-memory databases always exist (they're created on connection)
+        assert database_exists(uri)
         # Should not raise an error
-        assert not database_exists(uri)
-
         create_database(uri)
-
+        # Still exists after create (no-op for in-memory)
         assert database_exists(uri)
 
     def test_create_database_sqlite_file(self, tmp_path):
