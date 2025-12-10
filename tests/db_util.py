@@ -3,7 +3,7 @@
 These functions replace sqlalchemy-utils functionality for test purposes.
 """
 
-import os
+from pathlib import Path
 from urllib.parse import urlparse
 
 from sqlalchemy import create_engine, text
@@ -35,7 +35,7 @@ def _get_postgres_admin_uri(uri):
 
 
 def _get_sqlite_file_path(uri):
-    """Extract the file path from a SQLite URI."""
+    """Extract the file path from a SQLite URI as a Path object."""
     parsed = _parse_database_uri(uri)
     path = parsed["path"]
 
@@ -47,7 +47,7 @@ def _get_sqlite_file_path(uri):
     if path.startswith("/"):
         path = path[1:]
 
-    return path
+    return Path(path)
 
 
 def database_exists(uri):
@@ -87,7 +87,7 @@ def database_exists(uri):
             return True
 
         # For file-based SQLite, check if file exists
-        return os.path.exists(file_path)
+        return file_path.exists()
 
     else:
         raise ValueError(f"Unsupported database scheme: {scheme}")
@@ -122,15 +122,13 @@ def create_database(uri):
             return
 
         # For file-based SQLite, ensure the directory exists
-        dir_path = os.path.dirname(file_path)
-        if dir_path and not os.path.exists(dir_path):
-            os.makedirs(dir_path, exist_ok=True)
+        if file_path.parent:
+            file_path.parent.mkdir(parents=True, exist_ok=True)
 
         # Create an empty file to "create" the database
         # SQLite will create the file on first connection, but we'll touch it here
-        if not os.path.exists(file_path):
-            with open(file_path, "a"):
-                pass
+        if not file_path.exists():
+            file_path.touch()
 
     else:
         raise ValueError(f"Unsupported database scheme: {scheme}")
@@ -177,8 +175,8 @@ def drop_database(uri):
             return
 
         # For file-based SQLite, delete the file
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        if file_path.exists():
+            file_path.unlink()
 
     else:
         raise ValueError(f"Unsupported database scheme: {scheme}")
