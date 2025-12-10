@@ -134,34 +134,34 @@ class TestDatabaseExists:
 
     def test_database_exists_postgresql_nonexistent(self, postgres_uri):
         """Test checking non-existent PostgreSQL database."""
-        assert database_exists(postgres_uri) is False
+        assert not database_exists(postgres_uri)
 
     def test_database_exists_postgresql_existent(self, postgres_uri):
         """Test checking existing PostgreSQL database."""
         # Create the database first
         create_database(postgres_uri)
         try:
-            assert database_exists(postgres_uri) is True
+            assert database_exists(postgres_uri)
         finally:
             drop_database(postgres_uri)
 
     def test_database_exists_sqlite_memory(self):
         """Test checking in-memory SQLite database (always exists)."""
         uri = "sqlite:///:memory:"
-        assert database_exists(uri) is True
+        assert database_exists(uri)
 
     def test_database_exists_sqlite_file_nonexistent(self, tmp_path):
         """Test checking non-existent SQLite file database."""
         db_file = tmp_path / "nonexistent.db"
         uri = f"sqlite:///{db_file}"
-        assert database_exists(uri) is False
+        assert not database_exists(uri)
 
     def test_database_exists_sqlite_file_existent(self, tmp_path):
         """Test checking existing SQLite file database."""
         db_file = tmp_path / "existing.db"
         db_file.touch()
         uri = f"sqlite:///{db_file}"
-        assert database_exists(uri) is True
+        assert database_exists(uri)
 
     def test_database_exists_unsupported_scheme(self):
         """Test that unsupported schemes raise ValueError."""
@@ -191,7 +191,7 @@ class TestCreateDatabase:
 
         create_database(postgres_uri)
         try:
-            assert database_exists(postgres_uri) is True
+            assert database_exists(postgres_uri)
         finally:
             drop_database(postgres_uri)
 
@@ -213,7 +213,7 @@ class TestCreateDatabase:
         uri = "sqlite:///:memory:"
         # Should not raise an error
         create_database(uri)
-        assert database_exists(uri) is True
+        assert database_exists(uri)
 
     def test_create_database_sqlite_file(self, tmp_path):
         """Test creating a SQLite file database."""
@@ -223,7 +223,7 @@ class TestCreateDatabase:
         assert not db_file.exists()
         create_database(uri)
         assert db_file.exists()
-        assert database_exists(uri) is True
+        assert database_exists(uri)
 
         # Cleanup
         db_file.unlink()
@@ -241,7 +241,7 @@ class TestCreateDatabase:
 
         assert subdir.exists()
         assert db_file.exists()
-        assert database_exists(uri) is True
+        assert database_exists(uri)
 
         # Cleanup
         db_file.unlink()
@@ -286,9 +286,9 @@ class TestDropDatabase:
         if not database_exists(postgres_uri):
             create_database(postgres_uri)
 
-        assert database_exists(postgres_uri) is True
+        assert database_exists(postgres_uri)
         drop_database(postgres_uri)
-        assert database_exists(postgres_uri) is False
+        assert not database_exists(postgres_uri)
 
     def test_drop_database_postgresql_nonexistent(self, postgres_uri):
         """Test dropping a non-existent PostgreSQL database."""
@@ -298,7 +298,7 @@ class TestDropDatabase:
 
         # Should not raise an error (uses IF EXISTS)
         drop_database(postgres_uri)
-        assert database_exists(postgres_uri) is False
+        assert not database_exists(postgres_uri)
 
     def test_drop_database_postgresql_with_connections(self, postgres_uri):
         """Test dropping a PostgreSQL database that has active connections."""
@@ -315,7 +315,7 @@ class TestDropDatabase:
         try:
             # Drop should terminate connections and succeed
             drop_database(postgres_uri)
-            assert database_exists(postgres_uri) is False
+            assert not database_exists(postgres_uri)
         finally:
             conn.close()
             engine.dispose()
@@ -325,7 +325,7 @@ class TestDropDatabase:
         uri = "sqlite:///:memory:"
         # Should not raise an error
         drop_database(uri)
-        assert database_exists(uri) is True  # Still exists (in-memory)
+        assert database_exists(uri)  # Still exists (in-memory)
 
     def test_drop_database_sqlite_file_existent(self, tmp_path):
         """Test dropping an existing SQLite file database."""
@@ -336,7 +336,7 @@ class TestDropDatabase:
         assert db_file.exists()
         drop_database(uri)
         assert not db_file.exists()
-        assert database_exists(uri) is False
+        assert not database_exists(uri)
 
     def test_drop_database_sqlite_file_nonexistent(self, tmp_path):
         """Test dropping a non-existent SQLite file database."""
@@ -371,23 +371,23 @@ class TestDatabaseLifecycle:
     def test_postgresql_lifecycle(self, postgres_uri):
         """Test complete PostgreSQL database lifecycle."""
         # Start: database should not exist
-        assert database_exists(postgres_uri) is False
+        assert not database_exists(postgres_uri)
 
         # Create database
         create_database(postgres_uri)
-        assert database_exists(postgres_uri) is True
+        assert database_exists(postgres_uri)
 
         # Drop database
         drop_database(postgres_uri)
-        assert database_exists(postgres_uri) is False
+        assert not database_exists(postgres_uri)
 
         # Create again
         create_database(postgres_uri)
-        assert database_exists(postgres_uri) is True
+        assert database_exists(postgres_uri)
 
         # Final cleanup
         drop_database(postgres_uri)
-        assert database_exists(postgres_uri) is False
+        assert not database_exists(postgres_uri)
 
     def test_sqlite_file_lifecycle(self, tmp_path):
         """Test complete SQLite file database lifecycle."""
@@ -395,26 +395,26 @@ class TestDatabaseLifecycle:
         uri = f"sqlite:///{db_file}"
 
         # Start: database should not exist
-        assert database_exists(uri) is False
+        assert not database_exists(uri)
 
         # Create database
         create_database(uri)
-        assert database_exists(uri) is True
+        assert database_exists(uri)
         assert db_file.exists()
 
         # Drop database
         drop_database(uri)
-        assert database_exists(uri) is False
+        assert not database_exists(uri)
         assert not db_file.exists()
 
         # Create again
         create_database(uri)
-        assert database_exists(uri) is True
+        assert database_exists(uri)
         assert db_file.exists()
 
         # Final cleanup
         drop_database(uri)
-        assert database_exists(uri) is False
+        assert not database_exists(uri)
         assert not db_file.exists()
 
     def test_sqlite_memory_lifecycle(self):
@@ -422,15 +422,15 @@ class TestDatabaseLifecycle:
         uri = "sqlite:///:memory:"
 
         # In-memory always exists
-        assert database_exists(uri) is True
+        assert database_exists(uri)
 
         # Create is a no-op
         create_database(uri)
-        assert database_exists(uri) is True
+        assert database_exists(uri)
 
         # Drop is a no-op
         drop_database(uri)
-        assert database_exists(uri) is True
+        assert database_exists(uri)
 
 
 class TestDatabaseOperationsEdgeCases:
@@ -454,7 +454,7 @@ class TestDatabaseOperationsEdgeCases:
 
         create_database(uri)
         try:
-            assert database_exists(uri) is True
+            assert database_exists(uri)
         finally:
             drop_database(uri)
 
@@ -465,7 +465,7 @@ class TestDatabaseOperationsEdgeCases:
 
         create_database(uri)
         assert db_file.exists()
-        assert database_exists(uri) is True
+        assert database_exists(uri)
 
         drop_database(uri)
         assert not db_file.exists()
@@ -477,7 +477,7 @@ class TestDatabaseOperationsEdgeCases:
 
         create_database(uri)
         assert db_file.exists()
-        assert database_exists(uri) is True
+        assert database_exists(uri)
 
         drop_database(uri)
         assert not db_file.exists()
@@ -487,15 +487,15 @@ class TestDatabaseOperationsEdgeCases:
         # Create and drop multiple times
         for _ in range(3):
             create_database(postgres_uri)
-            assert database_exists(postgres_uri) is True
+            assert database_exists(postgres_uri)
             drop_database(postgres_uri)
-            assert database_exists(postgres_uri) is False
+            assert not database_exists(postgres_uri)
 
     def test_sqlite_empty_path(self):
         """Test SQLite URI with empty path."""
         uri = "sqlite:///"
         # Should be treated as in-memory
-        assert database_exists(uri) is True
+        assert database_exists(uri)
         create_database(uri)  # Should be no-op
         drop_database(uri)  # Should be no-op
 
