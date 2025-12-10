@@ -27,9 +27,10 @@ def _get_postgres_admin_uri(uri):
     """Get a PostgreSQL URI pointing to the 'postgres' database for admin operations."""
     parsed = _parse_database_uri(uri)
     # Connect to 'postgres' database instead of the target database
+    port_part = f":{parsed['port']}" if parsed['port'] is not None else ""
     admin_uri = (
         f"postgresql://{parsed['username']}:{parsed['password']}@"
-        f"{parsed['hostname']}:{parsed['port']}/postgres"
+        f"{parsed['hostname']}{port_part}/postgres"
     )
     return admin_uri
 
@@ -40,12 +41,16 @@ def _get_sqlite_file_path(uri):
     path = parsed["path"]
 
     # Handle :memory: and empty path
-    if not path or path == "/:memory:":
+    if not path or path == "/:memory:" or path == "/":
         return None
 
     # Remove leading slash
     if path.startswith("/"):
         path = path[1:]
+
+    # Handle empty string after stripping
+    if not path:
+        return None
 
     return Path(path)
 
