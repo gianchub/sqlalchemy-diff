@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Any, cast
 
 from sqlalchemy.engine import Engine
 
@@ -144,7 +144,7 @@ class ForeignKeysInspector(BaseInspector, DiffMixin):
     def _is_supported(self, inspector: Inspector) -> bool:
         return hasattr(inspector, "get_foreign_keys")
 
-    def _get_fk_identifier(self, fk: dict) -> dict:
+    def _get_fk_identifier(self, fk: Any) -> Any:
         if not fk["name"]:
             fk["name"] = f"_unnamed_fk_{fk['referred_table']}_{'_'.join(fk['constrained_columns'])}"
         return fk
