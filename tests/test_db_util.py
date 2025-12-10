@@ -227,9 +227,6 @@ class TestCreateDatabase:
         assert db_file.exists()
         assert database_exists(uri)
 
-        # Cleanup
-        db_file.unlink()
-
     def test_create_database_sqlite_file_with_subdirectory(self, tmp_path):
         """Test creating a SQLite file database in a subdirectory."""
         subdir = tmp_path / "subdir"
@@ -245,10 +242,6 @@ class TestCreateDatabase:
         assert db_file.exists()
         assert database_exists(uri)
 
-        # Cleanup
-        db_file.unlink()
-        subdir.rmdir()
-
     def test_create_database_sqlite_file_already_exists(self, tmp_path):
         """Test creating a SQLite file database that already exists."""
         db_file = tmp_path / "existing.db"
@@ -258,9 +251,6 @@ class TestCreateDatabase:
         # Should not raise an error, just touch the file
         create_database(uri)
         assert db_file.exists()
-
-        # Cleanup
-        db_file.unlink()
 
     def test_create_database_unsupported_scheme(self):
         """Test that unsupported schemes raise ValueError."""
