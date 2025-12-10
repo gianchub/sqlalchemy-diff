@@ -6,7 +6,6 @@ A tool for comparing database schemas using SQLAlchemy.
 
 - Python 3.10 or higher (supports 3.10, 3.11, 3.12, 3.13, 3.14)
 - SQLAlchemy >= 1.4
-- sqlalchemy-utils ~= 0.41.2
 
 ## Authors
 

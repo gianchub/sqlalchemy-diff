@@ -1,8 +1,3 @@
-"""Database utility functions for PostgreSQL and SQLite.
-
-These functions replace sqlalchemy-utils functionality for test purposes.
-"""
-
 from pathlib import Path
 from urllib.parse import urlparse
 
