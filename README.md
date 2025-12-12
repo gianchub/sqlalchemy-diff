@@ -60,6 +60,7 @@ result = comparer.compare()
 > [!NOTE]
 > When using the `from_params` classmethod, the engines will be disposed after the comparison is complete, to avoi leaving pooled connections open.
 > If instead you supply your own engines, **manage their lifecycle as needed**.
+> You can still pass a flag, `dispose_engines=True`, to the constructor to dispose the engines after the comparison is complete.
 
 
 ### Aliases
