@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.1]
+
+12/12/2025
+
+- Add `dispose_engines` flag to `Comparer` constructor.
+- Add `dispose` method to `Comparer` class.
+- Add tests for engine disposal.
+- Update README.md with new information.
+
 ## [1.1.0]
 
 10/12/2025
