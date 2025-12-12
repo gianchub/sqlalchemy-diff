@@ -1,6 +1,7 @@
 import json
 import logging
-from unittest.mock import patch
+from contextlib import nullcontext
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -156,6 +157,39 @@ class TestComparer(BaseTest):
 
         with open(error_file) as f:
             assert json.load(f) == compare_errors
+
+
+class TestComparerEngineDisposal(BaseTest):
+    @pytest.fixture
+    def engines(self):
+        engine_one = MagicMock()
+        engine_two = MagicMock()
+        engine_one.begin.side_effect = lambda: nullcontext()
+        engine_two.begin.side_effect = lambda: nullcontext()
+        return engine_one, engine_two
+
+    def test_from_params_disposes_engines(self, monkeypatch, engines):
+        engine_one, engine_two = engines
+
+        monkeypatch.setattr(
+            "sqlalchemydiff.connection.DBConnectionFactory.create_engine",
+            MagicMock(side_effect=[engine_one, engine_two]),
+        )
+
+        comparer = Comparer.from_params("postgresql://db_one", "postgresql://db_two")
+        comparer.compare()
+
+        engine_one.dispose.assert_called_once_with()
+        engine_two.dispose.assert_called_once_with()
+
+    def test_does_not_dispose_passed_engines(self, engines):
+        engine_one, engine_two = engines
+
+        comparer = Comparer(engine_one, engine_two)
+        comparer.compare()
+
+        engine_one.dispose.assert_not_called()
+        engine_two.dispose.assert_not_called()
 
 
 @pytest.mark.is_sqlalchemy_1_4

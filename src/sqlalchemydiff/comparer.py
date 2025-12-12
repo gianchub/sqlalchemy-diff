@@ -88,6 +88,10 @@ class Comparer:
 
     Simply call the `compare` method to get the result.
 
+    You can pass a flag, `dispose_engines`, to the constructor to dispose the engines after
+    the comparison is complete. If you use the `from_params` classmethod, the engines will
+    automatically be disposed after the comparison is complete.
+
     You can customise how certain aspects of the comparison are performed by setting your own
     classes for the `ignore_spec_factory` and `compare_result_class` attributes.
     """
@@ -95,9 +99,12 @@ class Comparer:
     ignore_spec_factory_class = IgnoreSpecFactory
     compare_result_class = CompareResult
 
-    def __init__(self, db_one_engine: Engine, db_two_engine: Engine):
+    def __init__(
+        self, db_one_engine: Engine, db_two_engine: Engine, *, dispose_engines: bool = False
+    ):
         self.db_one_engine = db_one_engine
         self.db_two_engine = db_two_engine
+        self._dispose_engines = dispose_engines
 
     @classmethod
     def from_params(
@@ -112,7 +119,7 @@ class Comparer:
         db_one_engine = DBConnectionFactory.create_engine(db_one_uri, **db_one_params)
         db_two_engine = DBConnectionFactory.create_engine(db_two_uri, **db_two_params)
 
-        return cls(db_one_engine, db_two_engine)
+        return cls(db_one_engine, db_two_engine, dispose_engines=True)
 
     def compare(
         self,
@@ -125,18 +132,23 @@ class Comparer:
 
         filtered_inspectors = self._filter_inspectors(set(ignore_inspectors or set()))
 
-        result = {}
-        with self.db_one_engine.begin(), self.db_two_engine.begin():
-            for key, inspector_class in filtered_inspectors:
-                inspector = inspector_class(one_alias=one_alias, two_alias=two_alias)
+        try:
+            result = {}
+            with self.db_one_engine.begin(), self.db_two_engine.begin():
+                for key, inspector_class in filtered_inspectors:
+                    inspector = inspector_class(one_alias=one_alias, two_alias=two_alias)
 
-                db_one_info = self._get_db_info(ignore_specs, inspector, self.db_one_engine)
-                db_two_info = self._get_db_info(ignore_specs, inspector, self.db_two_engine)
+                    db_one_info = self._get_db_info(ignore_specs, inspector, self.db_one_engine)
+                    db_two_info = self._get_db_info(ignore_specs, inspector, self.db_two_engine)
 
-                if db_one_info is not None and db_two_info is not None:
-                    result[key] = inspector.diff(db_one_info, db_two_info)
+                    if db_one_info is not None and db_two_info is not None:
+                        result[key] = inspector.diff(db_one_info, db_two_info)
 
-        return self.compare_result_class(result, one_alias=one_alias, two_alias=two_alias)
+            return self.compare_result_class(result, one_alias=one_alias, two_alias=two_alias)
+
+        finally:
+            if self._dispose_engines:
+                self.dispose()
 
     def _filter_inspectors(
         self, ignore_inspectors: set[str] | None
@@ -157,3 +169,8 @@ class Comparer:
             return inspector.inspect(engine, ignore_specs)
         except InspectorNotSupported as e:
             logger.warning({"engine": engine, "inspector": inspector.key, "error": e.message})
+
+    def dispose(self) -> None:
+        """Dispose engines to close any pooled connections."""
+        self.db_one_engine.dispose()
+        self.db_two_engine.dispose()
