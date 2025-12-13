@@ -27,11 +27,19 @@ class BaseTest:
 
     @pytest.fixture
     def db_engine_one(self, db_uri_one):
-        return get_engine(db_uri_one)
+        engine = get_engine(db_uri_one)
+        try:
+            yield engine
+        finally:
+            engine.dispose()
 
     @pytest.fixture
     def db_engine_two(self, db_uri_two):
-        return get_engine(db_uri_two)
+        engine = get_engine(db_uri_two)
+        try:
+            yield engine
+        finally:
+            engine.dispose()
 
     @pytest.fixture
     def setup_db_one(self, db_uri_one, db_engine_one):

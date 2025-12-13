@@ -1,6 +1,7 @@
 import json
 import logging
-from unittest.mock import patch
+from contextlib import nullcontext
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -135,8 +136,8 @@ class TestComparer(BaseTest):
             result = comparer.compare()
             assert result.result == compare_result
             assert result.errors == compare_errors
-            mock_begin_one.assert_called_once_with()
-            mock_begin_two.assert_called_once_with()
+            mock_begin_one.assert_called_once()
+            mock_begin_two.assert_called_once()
 
     @pytest.mark.usefixtures("setup_db_one", "setup_db_two")
     def test_dump_result(
@@ -158,6 +159,39 @@ class TestComparer(BaseTest):
             assert json.load(f) == compare_errors
 
 
+class TestComparerEngineDisposal(BaseTest):
+    @pytest.fixture
+    def engines(self):
+        engine_one = MagicMock()
+        engine_two = MagicMock()
+        engine_one.begin.side_effect = lambda: nullcontext()
+        engine_two.begin.side_effect = lambda: nullcontext()
+        return engine_one, engine_two
+
+    def test_from_params_disposes_engines(self, monkeypatch, engines):
+        engine_one, engine_two = engines
+
+        monkeypatch.setattr(
+            "sqlalchemydiff.connection.DBConnectionFactory.create_engine",
+            MagicMock(side_effect=[engine_one, engine_two]),
+        )
+
+        comparer = Comparer.from_params("postgresql://db_one", "postgresql://db_two")
+        comparer.compare()
+
+        engine_one.dispose.assert_called_once()
+        engine_two.dispose.assert_called_once()
+
+    def test_does_not_dispose_passed_engines(self, engines):
+        engine_one, engine_two = engines
+
+        comparer = Comparer(engine_one, engine_two)
+        comparer.compare()
+
+        engine_one.dispose.assert_not_called()
+        engine_two.dispose.assert_not_called()
+
+
 @pytest.mark.is_sqlalchemy_1_4
 class TestComparerV14(BaseTest):
     @pytest.mark.usefixtures("setup_db_one", "setup_db_two")
@@ -171,11 +205,19 @@ class TestComparerV14(BaseTest):
 class TestComparerSqlite(BaseTest):
     @pytest.fixture
     def sqlite_db_engine_one(self):
-        return get_engine("sqlite:///:memory:")
+        engine = get_engine("sqlite:///:memory:")
+        try:
+            yield engine
+        finally:
+            engine.dispose()
 
     @pytest.fixture
     def sqlite_db_engine_two(self):
-        return get_engine("sqlite:///:memory:")
+        engine = get_engine("sqlite:///:memory:")
+        try:
+            yield engine
+        finally:
+            engine.dispose()
 
     @pytest.fixture()
     def setup_db_one(self, sqlite_db_engine_one):

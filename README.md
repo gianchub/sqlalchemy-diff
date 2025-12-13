@@ -42,7 +42,7 @@ result.dump_result('comparison_result.json')
 result.dump_errors('comparison_errors.json')
 ```
 
-You can also create a comparer directly from database URIs:
+You can create a comparer directly from database URIs, using the `from_params` classmethod:
 
 ```python
 from sqlalchemydiff.comparer import Comparer
@@ -56,23 +56,36 @@ comparer = Comparer.from_params(
 result = comparer.compare()
 ```
 
+
+> [!NOTE]
+> When using the `from_params` classmethod, the engines will be disposed after the comparison is complete, to avoi leaving pooled connections open.
+> If instead you supply your own engines, **manage their lifecycle as needed**.
+> You can still pass a flag, `dispose_engines=True`, to the constructor to dispose the engines after the comparison is complete.
+
+
+### Aliases
+
 You can use meaningful aliases for the results:
 
 ```python
 result = comparer.compare(one_alias='production', two_alias='staging')
 ```
 
+## Inspectors
+
 The built-in inspectors includes: **tables**, **columns**, **primary keys**, **foreign keys**, **indexes**, **unique constraints**, **check constraints**, and **enums**.
 
-### To ignore specific inspectors:
+### Ignoring inspectors:
 
-For example, ignore enums and check constraints inspectors
+To ignore specific inspectors, you can pass a list of inspector keys to the `compare` method.
+
+For example, to ignore enums and check constraints inspectors:
 
 ```python
 result = comparer.compare(ignore_inspectors=['enums', 'check_constraints'])
 ```
 
-## Custom Inspectors
+### Custom Inspectors
 
 You can create your own custom inspectors to compare specific aspects of your database schemas.
 
@@ -140,12 +153,11 @@ class MyCustomInspector(BaseInspector, DiffMixin):
         return hasattr(inspector, 'get_something')
 ```
 
-### Important Notes
+> [!IMPORTANT]
+> - The `key` attribute must be unique, non-empty and must not start or end with whitespace
+> - Use the `DiffMixin` helper methods (`_listdiff`, `_dictdiff`, `_itemsdiff`) for consistent comparison logic
 
-- The `key` attribute must be unique, non-empty and must not start or end with whitespace
-- Use the `DiffMixin` helper methods (`_listdiff`, `_dictdiff`, `_itemsdiff`) for consistent comparison logic
-
-### Example: A Custom Sequences Inspector
+#### Example: A Custom Sequences Inspector
 
 This is a working example of a inspector that compares sequences.
 

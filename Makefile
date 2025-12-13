@@ -1,5 +1,5 @@
 .PHONY: ruff-fix ruff-check ruff-format ruff-format-check lint format test install-tox-uv test-sqlalchemy14
-.PHONY: ty install-reqs docker-test-db-run build publish-test publish bump-version
+.PHONY: ty install-reqs update-reqs docker-test-db-run build publish-test publish bump-version
 
 # Misc
 
@@ -40,6 +40,9 @@ ty:
 	uv run ty check $(MODULE_NAME) $(TEST_MODULE_NAME)
 
 # requirements
+
+update-reqs:
+	uv lock --upgrade
 
 install-reqs:
 	uv pip install -U -e ."[dev,lint,test]"
