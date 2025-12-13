@@ -104,7 +104,7 @@ class Comparer:
     ):
         self.db_one_engine = db_one_engine
         self.db_two_engine = db_two_engine
-        self._dispose_engines = dispose_engines
+        self.__dispose_engines = dispose_engines
 
     @classmethod
     def from_params(
@@ -147,8 +147,8 @@ class Comparer:
             return self.compare_result_class(result, one_alias=one_alias, two_alias=two_alias)
 
         finally:
-            if self._dispose_engines:
-                self.dispose()
+            if self.__dispose_engines:
+                self._dispose_engines()
 
     def _filter_inspectors(
         self, ignore_inspectors: set[str] | None
@@ -170,7 +170,7 @@ class Comparer:
         except InspectorNotSupported as e:
             logger.warning({"engine": engine, "inspector": inspector.key, "error": e.message})
 
-    def dispose(self) -> None:
+    def _dispose_engines(self) -> None:
         """Dispose engines to close any pooled connections."""
         self.db_one_engine.dispose()
         self.db_two_engine.dispose()
