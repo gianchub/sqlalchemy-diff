@@ -205,11 +205,19 @@ class TestComparerV14(BaseTest):
 class TestComparerSqlite(BaseTest):
     @pytest.fixture
     def sqlite_db_engine_one(self):
-        return get_engine("sqlite:///:memory:")
+        engine = get_engine("sqlite:///:memory:")
+        try:
+            yield engine
+        finally:
+            engine.dispose()
 
     @pytest.fixture
     def sqlite_db_engine_two(self):
-        return get_engine("sqlite:///:memory:")
+        engine = get_engine("sqlite:///:memory:")
+        try:
+            yield engine
+        finally:
+            engine.dispose()
 
     @pytest.fixture()
     def setup_db_one(self, sqlite_db_engine_one):
