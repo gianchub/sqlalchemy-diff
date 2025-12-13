@@ -136,8 +136,8 @@ class TestComparer(BaseTest):
             result = comparer.compare()
             assert result.result == compare_result
             assert result.errors == compare_errors
-            mock_begin_one.assert_called_once_with()
-            mock_begin_two.assert_called_once_with()
+            mock_begin_one.assert_called_once()
+            mock_begin_two.assert_called_once()
 
     @pytest.mark.usefixtures("setup_db_one", "setup_db_two")
     def test_dump_result(
@@ -179,8 +179,8 @@ class TestComparerEngineDisposal(BaseTest):
         comparer = Comparer.from_params("postgresql://db_one", "postgresql://db_two")
         comparer.compare()
 
-        engine_one.dispose.assert_called_once_with()
-        engine_two.dispose.assert_called_once_with()
+        engine_one.dispose.assert_called_once()
+        engine_two.dispose.assert_called_once()
 
     def test_does_not_dispose_passed_engines(self, engines):
         engine_one, engine_two = engines
