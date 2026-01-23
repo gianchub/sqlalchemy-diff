@@ -59,7 +59,10 @@ class BaseInspector(abc.ABC, metaclass=BaseInspectorMeta):
 
     @abc.abstractmethod
     def inspect(
-        self, engine: Engine, ignore_specs: list[IgnoreSpecType] | None = None
+        self,
+        engine: Engine,
+        ignore_specs: list[IgnoreSpecType] | None = None,
+        schema: str | None = None,
     ) -> Any: ...  # pragma: no cover
 
     @abc.abstractmethod

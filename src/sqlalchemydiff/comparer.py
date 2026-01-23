@@ -127,7 +127,19 @@ class Comparer:
         two_alias: str = "two",
         ignores: list[str] | None = None,
         ignore_inspectors: Iterable[str] | None = None,
+        one_schema: str | None = None,
+        two_schema: str | None = None,
     ):
+        """Compare two databases.
+
+        :param one_alias: Alias for the first database in the result.
+        :param two_alias: Alias for the second database in the result.
+        :param ignores: List of ignore specifications.
+        :param ignore_inspectors: List of inspector keys to ignore.
+        :param one_schema: Schema name for the first database. If None, uses the default schema.
+        :param two_schema: Schema name for the second database. If None, uses the default schema.
+        :return: A CompareResult object with the comparison result.
+        """
         ignore_specs = self.ignore_spec_factory_class().create_specs(register, ignores)
 
         filtered_inspectors = self._filter_inspectors(set(ignore_inspectors or set()))
@@ -138,8 +150,12 @@ class Comparer:
                 for key, inspector_class in filtered_inspectors:
                     inspector = inspector_class(one_alias=one_alias, two_alias=two_alias)
 
-                    db_one_info = self._get_db_info(ignore_specs, inspector, self.db_one_engine)
-                    db_two_info = self._get_db_info(ignore_specs, inspector, self.db_two_engine)
+                    db_one_info = self._get_db_info(
+                        ignore_specs, inspector, self.db_one_engine, schema=one_schema
+                    )
+                    db_two_info = self._get_db_info(
+                        ignore_specs, inspector, self.db_two_engine, schema=two_schema
+                    )
 
                     if db_one_info is not None and db_two_info is not None:
                         result[key] = inspector.diff(db_one_info, db_two_info)
@@ -163,10 +179,14 @@ class Comparer:
         return [(key, cls) for key, (_, cls) in register.items() if key not in ignore_inspectors]
 
     def _get_db_info(
-        self, ignore_specs: list[IgnoreSpecType], inspector: BaseInspector, engine: Engine
+        self,
+        ignore_specs: list[IgnoreSpecType],
+        inspector: BaseInspector,
+        engine: Engine,
+        schema: str | None = None,
     ) -> dict | None:
         try:
-            return inspector.inspect(engine, ignore_specs)
+            return inspector.inspect(engine, ignore_specs, schema=schema)
         except InspectorNotSupported as e:
             logger.warning({"engine": engine, "inspector": inspector.key, "error": e.message})
 
