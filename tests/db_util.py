@@ -54,7 +54,7 @@ def database_exists(uri):
         bool: True if database exists, False otherwise
     """
     parsed = _parse_database_uri(uri)
-    scheme = parsed["scheme"]
+    scheme = parsed["scheme"].split("+", 1)[0]
 
     if scheme == "postgresql":
         admin_uri = _get_postgres_admin_uri(uri)
@@ -91,7 +91,7 @@ def create_database(uri):
         uri: Database URI (postgresql://... or sqlite:///...)
     """
     parsed = _parse_database_uri(uri)
-    scheme = parsed["scheme"]
+    scheme = parsed["scheme"].split("+", 1)[0]
 
     if scheme == "postgresql":
         admin_uri = _get_postgres_admin_uri(uri)
@@ -132,7 +132,7 @@ def drop_database(uri):
         uri: Database URI (postgresql://... or sqlite:///...)
     """
     parsed = _parse_database_uri(uri)
-    scheme = parsed["scheme"]
+    scheme = parsed["scheme"].split("+", 1)[0]
 
     if scheme == "postgresql":
         admin_uri = _get_postgres_admin_uri(uri)

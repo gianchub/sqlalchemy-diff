@@ -4,13 +4,48 @@ A tool for comparing database schemas using SQLAlchemy.
 
 ## Requirements
 
-- Python 3.10 or higher (supports 3.10, 3.11, 3.12, 3.13, 3.14)
+- Python 3.10 or higher (supports 3.10, 3.11, 3.12, 3.13, 3.14, 3.15)
 - SQLAlchemy >= 1.4
 
 ## Authors
 
 - [Fabrizio Romano](https://github.com/gianchub)
 - [Mark McArdle](https://github.com/mmcardle)
+
+## Development and testing
+
+Install [uv](https://docs.astral.sh/uv/) and Make. The integration tests also require
+PostgreSQL. With Docker running, start the test database and install the test tools:
+
+```sh
+make docker-test-db-run
+uv sync --extra test --extra lint
+make test
+make lint
+```
+
+`make test` runs the SQLAlchemy 2.x suite and requires 100% coverage. The database
+defaults are `localhost:5433`, user `postgres`, and password `postgres`. To use an
+existing PostgreSQL server, set `DB_TEST_HOST`, `DB_TEST_PORT`, `DB_TEST_USER`, and
+`DB_TEST_PASSWORD`. The database user must be able to create and drop databases.
+
+Run the full Python 3.10–3.15 matrix, including separate SQLAlchemy 1.4 environments:
+
+```sh
+uv python install 3.10 3.11 3.12 3.13 3.14 3.15
+uvx --with tox-uv tox
+```
+
+To run just the Python 3.15 environments:
+
+```sh
+uvx --with tox-uv tox -e py315,py315-sqlalchemy14
+```
+
+The SQLAlchemy 1.4 environments run the tests marked `is_sqlalchemy_1_4`, which
+check its version-specific reflection results. The other environments run the
+remaining tests with SQLAlchemy 2.x. The Make test targets use the active virtual
+environment without syncing it, so tox's Python and SQLAlchemy versions are preserved.
 
 # Usage
 

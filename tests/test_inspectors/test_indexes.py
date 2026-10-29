@@ -39,7 +39,7 @@ class TestIndexesInspector(BaseTest):
         assert_dicts_equal(result, indexes_one_with_ignores)
 
     @pytest.mark.usefixtures("setup_db_one", "setup_db_two")
-    def testdiff(self, db_engine_one, db_engine_two, inspector):
+    def testdiff(self, db_engine_one, db_engine_two, inspector, index_include_columns):
         result_one = inspector.inspect(db_engine_one)
         result_two = inspector.inspect(db_engine_two)
 
@@ -52,7 +52,7 @@ class TestIndexesInspector(BaseTest):
                         "name": "companies_name_key",
                         "unique": True,
                         "column_names": ["name"],
-                        "include_columns": [],
+                        **index_include_columns,
                         "duplicates_constraint": "companies_name_key",
                         "dialect_options": {"postgresql_include": []},
                     }
@@ -67,7 +67,7 @@ class TestIndexesInspector(BaseTest):
                         "name": "ix_employees_name",
                         "unique": True,
                         "column_names": ["name"],
-                        "include_columns": [],
+                        **index_include_columns,
                         "dialect_options": {"postgresql_include": []},
                     }
                 ],
@@ -76,7 +76,7 @@ class TestIndexesInspector(BaseTest):
                         "name": "employees_name_key",
                         "unique": True,
                         "column_names": ["name"],
-                        "include_columns": [],
+                        **index_include_columns,
                         "duplicates_constraint": "employees_name_key",
                         "dialect_options": {"postgresql_include": []},
                     },
@@ -84,21 +84,21 @@ class TestIndexesInspector(BaseTest):
                         "name": "idx_title_department",
                         "unique": False,
                         "column_names": ["title", "department"],
-                        "include_columns": [],
+                        **index_include_columns,
                         "dialect_options": {"postgresql_include": []},
                     },
                     {
                         "name": "ix_employees_ssn",
                         "unique": False,
                         "column_names": ["ssn"],
-                        "include_columns": [],
+                        **index_include_columns,
                         "dialect_options": {"postgresql_include": []},
                     },
                     {
                         "name": "unique_employee_name_age",
                         "unique": True,
                         "column_names": ["name", "age"],
-                        "include_columns": [],
+                        **index_include_columns,
                         "duplicates_constraint": "unique_employee_name_age",
                         "dialect_options": {"postgresql_include": []},
                     },
@@ -120,7 +120,7 @@ class TestIndexesInspector(BaseTest):
                         "name": "ix_roles_name",
                         "unique": False,
                         "column_names": ["name"],
-                        "include_columns": [],
+                        **index_include_columns,
                         "dialect_options": {"postgresql_include": []},
                     }
                 ],
@@ -134,7 +134,7 @@ class TestIndexesInspector(BaseTest):
                         "name": "skills_description_key",
                         "unique": True,
                         "column_names": ["description"],
-                        "include_columns": [],
+                        **index_include_columns,
                         "duplicates_constraint": "skills_description_key",
                         "dialect_options": {"postgresql_include": []},
                     }
