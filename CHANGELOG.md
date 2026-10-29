@@ -1,6 +1,8 @@
 # Changelog
 
-## [Unreleased]
+## [1.1.2]
+
+29/10/2026
 
 - Add Python 3.15 support and extend the CI and tox test matrices through 3.15.
 - Fix SQLAlchemy 1.4 tox inheritance and preserve test environment dependencies.

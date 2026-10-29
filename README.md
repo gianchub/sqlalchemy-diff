@@ -32,7 +32,6 @@ existing PostgreSQL server, set `DB_TEST_HOST`, `DB_TEST_PORT`, `DB_TEST_USER`, 
 Run the full Python 3.10–3.15 matrix, including separate SQLAlchemy 1.4 environments:
 
 ```sh
-uv python install 3.10 3.11 3.12 3.13 3.14 3.15
 uvx --with tox-uv tox
 ```
 
