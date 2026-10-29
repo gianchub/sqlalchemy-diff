@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.2]
+
+29/10/2026
+
+- Add Python 3.15 support and extend the CI and tox test matrices through 3.15.
+- Fix SQLAlchemy 1.4 tox inheritance and preserve test environment dependencies.
+- Install SQLAlchemy 1.4 in its CI jobs and document how to run the test matrix.
+- Select psycopg2 explicitly in tests for compatibility with SQLAlchemy 2.1.
+- Correct SQLAlchemy 1.4 constraint expectations and two type annotations.
+- Refresh `uv.lock` without changing the declared dependency ranges.
+
 ## [1.1.1]
 
 12/12/2025
