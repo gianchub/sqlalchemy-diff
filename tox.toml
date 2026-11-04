@@ -1,10 +1,12 @@
 requires = ["tox>=4", "tox-uv"]
 env_list = [
+    "py315",
     "py314",
     "py313",
     "py312",
     "py311",
     "py310",
+    "py315-sqlalchemy14",
     "py314-sqlalchemy14",
     "py313-sqlalchemy14",
     "py312-sqlalchemy14",
@@ -18,6 +20,7 @@ description = "Run unit tests with Python {basepython} and sqlalchemy>=2.0"
 wheel_build_env = "{package_env}"
 runner = "uv-venv-runner"
 extras = ["test"]
+deps = ["sqlalchemy>=2,<3"]
 allowlist_externals = ["make"]
 passenv = ["DB_TEST_USER", "DB_TEST_PASSWORD", "DB_TEST_PORT", "DB_TEST_HOST"]
 commands = [
@@ -49,20 +52,24 @@ commands = [
 
 [env.py310-sqlalchemy14]
 description = "Run unit tests with Python 3.10 and sqlalchemy V1.4"
-base = ["env.sqlalchemy14"]
+base = ["sqlalchemy14"]
 
 [env.py311-sqlalchemy14]
 description = "Run unit tests with Python 3.11 and sqlalchemy V1.4"
-base = ["env.sqlalchemy14"]
+base = ["sqlalchemy14"]
 
 [env.py312-sqlalchemy14]
 description = "Run unit tests with Python 3.12 and sqlalchemy V1.4"
-base = ["env.sqlalchemy14"]
+base = ["sqlalchemy14"]
 
 [env.py313-sqlalchemy14]
 description = "Run unit tests with Python 3.13 and sqlalchemy V1.4"
-base = ["env.sqlalchemy14"]
+base = ["sqlalchemy14"]
 
 [env.py314-sqlalchemy14]
 description = "Run unit tests with Python 3.14 and sqlalchemy V1.4"
-base = ["env.sqlalchemy14"]
+base = ["sqlalchemy14"]
+
+[env.py315-sqlalchemy14]
+description = "Run unit tests with Python 3.15 and sqlalchemy V1.4"
+base = ["sqlalchemy14"]

@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.14"]
+        python-version: ["3.10", "3.15"]
 
     steps:
     - uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.14"]
+        python-version: ["3.10", "3.15"]
 
     steps:
     - uses: actions/checkout@v4
@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14", "3.15"]
         tests-command: ["test", "test-sqlalchemy14"]
 
     services:
@@ -97,6 +97,10 @@ jobs:
 
     - name: Install dependencies
       run: uv pip install -e ".[dev,lint,test]"
+
+    - name: Install SQLAlchemy 1.4
+      if: matrix.tests-command == 'test-sqlalchemy14'
+      run: uv pip install "sqlalchemy~=1.4"
 
     - name: Run tests
       run: make ${{ matrix.tests-command }}

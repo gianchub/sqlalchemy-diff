@@ -1,4 +1,24 @@
 import pytest
+from sqlalchemy import __version__ as sqlalchemy_version
+
+
+def _sqlalchemy14_constraints(value):
+    """Match the constraint metadata and SQL text reflected by SQLAlchemy 1.4."""
+    if isinstance(value, dict):
+        return {
+            key: _sqlalchemy14_constraints(item)
+            for key, item in value.items()
+            if key not in {"comment", "dialect_options"}
+        }
+    if isinstance(value, list):
+        return [_sqlalchemy14_constraints(item) for item in value]
+    if isinstance(value, str):
+        return {
+            "age > 0 AND age <= 100": "(age > 0) AND (age <= 100)",
+            "age > 0 AND age <= 90": "(age > 0) AND (age <= 90)",
+            "length(name::text) > 5": "length((name)::text) > 5",
+        }.get(value, value)
+    return value
 
 
 def pytest_addoption(parser):
@@ -26,7 +46,7 @@ def make_postgres_uri(config):
     def _make_uri(db_name):
         postgres_cfg = config["postgres"]
         return (
-            f"postgresql://{postgres_cfg['user']}:{postgres_cfg['password']}@"
+            f"postgresql+psycopg2://{postgres_cfg['user']}:{postgres_cfg['password']}@"
             f"{postgres_cfg['host']}:{postgres_cfg['port']}/{db_name}"
         )
 
@@ -374,14 +394,21 @@ def foreign_keys_one():
 
 
 @pytest.fixture
-def indexes_one():
+def index_include_columns():
+    """The legacy include_columns reflection key was removed in SQLAlchemy 2.1."""
+    major, minor, *_ = sqlalchemy_version.split(".")
+    return {"include_columns": []} if (int(major), int(minor)) < (2, 1) else {}
+
+
+@pytest.fixture
+def indexes_one(index_include_columns):
     return {
         "companies": [
             {
                 "column_names": ["name"],
                 "dialect_options": {"postgresql_include": []},
                 "duplicates_constraint": "companies_name_key",
-                "include_columns": [],
+                **index_include_columns,
                 "name": "companies_name_key",
                 "unique": True,
             }
@@ -390,7 +417,7 @@ def indexes_one():
             {
                 "column_names": ["name"],
                 "dialect_options": {"postgresql_include": []},
-                "include_columns": [],
+                **index_include_columns,
                 "name": "ix_employees_name",
                 "unique": True,
             }
@@ -1128,7 +1155,7 @@ def compare_result_foreign_keys():
 
 
 @pytest.fixture
-def compare_result_indexes():
+def compare_result_indexes(index_include_columns):
     return {
         "companies": {
             "one_only": [
@@ -1137,7 +1164,7 @@ def compare_result_indexes():
                     "unique": True,
                     "column_names": ["name"],
                     "duplicates_constraint": "companies_name_key",
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 }
             ],
@@ -1151,7 +1178,7 @@ def compare_result_indexes():
                     "name": "ix_employees_name",
                     "unique": True,
                     "column_names": ["name"],
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 }
             ],
@@ -1161,21 +1188,21 @@ def compare_result_indexes():
                     "unique": True,
                     "column_names": ["name"],
                     "duplicates_constraint": "employees_name_key",
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 },
                 {
                     "name": "idx_title_department",
                     "unique": False,
                     "column_names": ["title", "department"],
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 },
                 {
                     "name": "ix_employees_ssn",
                     "unique": False,
                     "column_names": ["ssn"],
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 },
                 {
@@ -1183,7 +1210,7 @@ def compare_result_indexes():
                     "unique": True,
                     "column_names": ["name", "age"],
                     "duplicates_constraint": "unique_employee_name_age",
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 },
             ],
@@ -1199,7 +1226,7 @@ def compare_result_indexes():
                     "name": "ix_roles_name",
                     "unique": False,
                     "column_names": ["name"],
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 }
             ],
@@ -1214,7 +1241,7 @@ def compare_result_indexes():
                     "unique": True,
                     "column_names": ["description"],
                     "duplicates_constraint": "skills_description_key",
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 }
             ],
@@ -1398,11 +1425,11 @@ def compare_result_v14(
     return {
         "tables": compare_result_tables_factory(),
         "columns": compare_result_columns,
-        "primary_keys": compare_result_primary_keys,
-        "foreign_keys": compare_result_foreign_keys,
+        "primary_keys": _sqlalchemy14_constraints(compare_result_primary_keys),
+        "foreign_keys": _sqlalchemy14_constraints(compare_result_foreign_keys),
         "indexes": compare_result_indexes,
-        "unique_constraints": compare_result_unique_constraints,
-        "check_constraints": compare_result_check_constraints,
+        "unique_constraints": _sqlalchemy14_constraints(compare_result_unique_constraints),
+        "check_constraints": _sqlalchemy14_constraints(compare_result_check_constraints),
         "enums": compare_result_enums,
     }
 
@@ -1905,7 +1932,7 @@ def compare_errors_foreign_keys():
 
 
 @pytest.fixture
-def compare_errors_indexes():
+def compare_errors_indexes(index_include_columns):
     return {
         "companies": {
             "one_only": [
@@ -1914,7 +1941,7 @@ def compare_errors_indexes():
                     "unique": True,
                     "column_names": ["name"],
                     "duplicates_constraint": "companies_name_key",
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 }
             ]
@@ -1925,7 +1952,7 @@ def compare_errors_indexes():
                     "name": "ix_employees_name",
                     "unique": True,
                     "column_names": ["name"],
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 }
             ],
@@ -1935,21 +1962,21 @@ def compare_errors_indexes():
                     "unique": True,
                     "column_names": ["name"],
                     "duplicates_constraint": "employees_name_key",
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 },
                 {
                     "name": "idx_title_department",
                     "unique": False,
                     "column_names": ["title", "department"],
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 },
                 {
                     "name": "ix_employees_ssn",
                     "unique": False,
                     "column_names": ["ssn"],
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 },
                 {
@@ -1957,7 +1984,7 @@ def compare_errors_indexes():
                     "unique": True,
                     "column_names": ["name", "age"],
                     "duplicates_constraint": "unique_employee_name_age",
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 },
             ],
@@ -1968,7 +1995,7 @@ def compare_errors_indexes():
                     "name": "ix_roles_name",
                     "unique": False,
                     "column_names": ["name"],
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 }
             ]
@@ -1980,7 +2007,7 @@ def compare_errors_indexes():
                     "unique": True,
                     "column_names": ["description"],
                     "duplicates_constraint": "skills_description_key",
-                    "include_columns": [],
+                    **index_include_columns,
                     "dialect_options": {"postgresql_include": []},
                 }
             ]
@@ -2117,11 +2144,11 @@ def compare_errors_v14(
     return {
         "tables": compare_errors_tables_factory(),
         "columns": compare_errors_columns,
-        "primary_keys": compare_errors_primary_keys,
-        "foreign_keys": compare_errors_foreign_keys,
+        "primary_keys": _sqlalchemy14_constraints(compare_errors_primary_keys),
+        "foreign_keys": _sqlalchemy14_constraints(compare_errors_foreign_keys),
         "indexes": compare_errors_indexes,
-        "unique_constraints": compare_errors_unique_constraints,
-        "check_constraints": compare_errors_check_constraints,
+        "unique_constraints": _sqlalchemy14_constraints(compare_errors_unique_constraints),
+        "check_constraints": _sqlalchemy14_constraints(compare_errors_check_constraints),
         "enums": compare_errors_enums,
     }
 

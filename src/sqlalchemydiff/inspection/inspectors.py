@@ -71,7 +71,7 @@ class ColumnsInspector(BaseInspector, DiffMixin):
     def diff(self, one: dict, two: dict) -> dict:
         return self._listdiff(one, two)
 
-    def _process_types(self, column_dict: dict, engine: Engine) -> None:
+    def _process_types(self, column_dict: list, engine: Engine) -> None:
         """Process the SQLAlchemy Column Type ``type_``.
 
         Calls :meth:`sqlalchemy.sql.type_api.TypeEngine.compile` on

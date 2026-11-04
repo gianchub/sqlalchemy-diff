@@ -1,6 +1,6 @@
 import abc
 import inspect as stdlib_inspect
-from typing import Any
+from typing import Any, cast
 
 from sqlalchemy import inspect
 from sqlalchemy.engine import Engine
@@ -22,7 +22,7 @@ class BaseInspectorMeta(abc.ABCMeta):
     register = {}
 
     def __new__(mcs, name: str, bases: tuple, attrs: dict) -> type:
-        cls = super().__new__(mcs, name, bases, attrs)
+        cls = cast("type[BaseInspector]", super().__new__(mcs, name, bases, attrs))
 
         if stdlib_inspect.isabstract(cls):
             return cls

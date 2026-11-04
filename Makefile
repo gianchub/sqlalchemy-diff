@@ -54,7 +54,7 @@ install-tox-uv:
 # Tests
 test: ARGS?=--cov
 test:
-	uv run pytest tests $(ARGS) -m 'not is_sqlalchemy_1_4' \
+	uv run --active --no-sync pytest tests $(ARGS) -m 'not is_sqlalchemy_1_4' \
 		--db-user=$(DB_TEST_USER) \
 		--db-password=$(DB_TEST_PASSWORD) \
 		--db-host=$(DB_TEST_HOST) \
@@ -62,7 +62,7 @@ test:
 
 
 test-sqlalchemy14:
-	uv run pytest tests --no-cov $(ARGS) -m 'is_sqlalchemy_1_4' \
+	uv run --active --no-sync pytest tests --no-cov $(ARGS) -m 'is_sqlalchemy_1_4' \
 		--db-user=$(DB_TEST_USER) \
 		--db-password=$(DB_TEST_PASSWORD) \
 		--db-host=$(DB_TEST_HOST) \
