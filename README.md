@@ -4,7 +4,7 @@ A tool for comparing database schemas using SQLAlchemy.
 
 ## Requirements
 
-- Python 3.10 or higher (supports 3.10, 3.11, 3.12, 3.13, 3.14, 3.15)
+- Python 3.11 through 3.15
 - SQLAlchemy >= 1.4
 
 ## Authors
@@ -29,7 +29,10 @@ defaults are `localhost:5433`, user `postgres`, and password `postgres`. To use 
 existing PostgreSQL server, set `DB_TEST_HOST`, `DB_TEST_PORT`, `DB_TEST_USER`, and
 `DB_TEST_PASSWORD`. The database user must be able to create and drop databases.
 
-Run the full Python 3.10–3.15 matrix, including separate SQLAlchemy 1.4 environments:
+The `dev` extra includes JupyterLab on Python 3.11.5 and later, which can install
+the patched Tornado and SoupSieve releases.
+
+Run the full Python 3.11–3.15 matrix, including separate SQLAlchemy 1.4 environments:
 
 ```sh
 uvx --with tox-uv tox

@@ -5,13 +5,11 @@ env_list = [
     "py313",
     "py312",
     "py311",
-    "py310",
     "py315-sqlalchemy14",
     "py314-sqlalchemy14",
     "py313-sqlalchemy14",
     "py312-sqlalchemy14",
     "py311-sqlalchemy14",
-    "py310-sqlalchemy14",
 ]
 
 [env_run_base]
@@ -49,10 +47,6 @@ passenv = ["DB_TEST_USER", "DB_TEST_PASSWORD", "DB_TEST_PORT", "DB_TEST_HOST"]
 commands = [
     ["make", "test-sqlalchemy14", "ARGS={posargs:-vv --no-cov}"],
 ]
-
-[env.py310-sqlalchemy14]
-description = "Run unit tests with Python 3.10 and sqlalchemy V1.4"
-base = ["sqlalchemy14"]
 
 [env.py311-sqlalchemy14]
 description = "Run unit tests with Python 3.11 and sqlalchemy V1.4"
