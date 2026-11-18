@@ -1,6 +1,6 @@
 [project]
 name = "sqlalchemy-diff"
-version = "1.1.2"
+version = "1.2.0"
 authors = [
     { name = "Fabrizio Romano", email = "gianchub@gmail.com" },
     { name = "Mark McArdle", email = "m.mc4rdle@gmail.com" },
@@ -8,10 +8,9 @@ authors = [
 description = "A tool for comparing database schemas using SQLAlchemy"
 readme = "README.md"
 license-files = ["LICEN[CS]E*"]
-requires-python = ">=3.10"
+requires-python = ">=3.11,<3.16"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
@@ -36,7 +35,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "jupyterlab",
+    "jupyterlab; python_full_version >= '3.11.5'",
     "pdbpp",
     "rich",
 ]
@@ -81,7 +80,7 @@ line-length = 100
 
 [tool.ruff]
 line-length = 100
-target-version = "py310"
+target-version = "py311"
 
 [tool.ruff.format]
 # Like Black, use double quotes for strings.

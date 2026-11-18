@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0]
+
+18/11/2026
+
+- Support Python 3.11 through 3.15 and update the CI and tox matrices.
+- Update the locked versions of Tornado to 6.6.1 and SoupSieve to 4.1.1 to address seven Dependabot alerts.
+- Install JupyterLab through the `dev` extra on Python 3.11.5 and later.
+
 ## [1.1.2]
 
 29/10/2026
